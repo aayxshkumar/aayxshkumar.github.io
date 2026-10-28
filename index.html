@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aayush Kumar: Software Engineer, C++ and low-latency systems</title>
+  <meta name="description" content="Software engineer at Airbus building C++/Qt software for 40,000 pilots a day. Building lob-engine, a benchmarked C++20 matching engine. Certified Kubernetes Administrator.">
+  <link rel="canonical" href="https://aayxshkumar.github.io/">
+  <meta name="theme-color" content="#F2EEE5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D0E0B" media="(prefers-color-scheme: dark)">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aayxshkumar.github.io/">
+  <meta property="og:title" content="Aayush Kumar: C++ and low-latency systems">
+  <meta property="og:description" content="C++/Qt at Airbus for 40,000 pilots a day. In my own time, a matching engine measured in nanoseconds.">
+  <meta property="og:image" content="https://aayxshkumar.github.io/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Aayush Kumar",
+    "jobTitle": "Software Developer",
+    "worksFor": { "@type": "Organization", "name": "Airbus" },
+    "alumniOf": { "@type": "CollegeOrUniversity", "name": "National Institute of Technology, Kurukshetra" },
+    "url": "https://aayxshkumar.github.io/",
+    "email": "mailto:aayushkumr25@gmail.com",
+    "sameAs": ["https://github.com/aayxshkumar", "https://linkedin.com/in/aayush-kumr"],
+    "knowsAbout": ["C++", "Low-latency systems", "Order books", "Kubernetes", "Qt"]
+  }
+  </script>
+  <script>
+    // Apply a saved theme before first paint to avoid a flash.
+    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+    // Content is visible without JS; with JS it animates in, and is forced
+    // visible after 1.5 s in case animations never get to run.
+    document.documentElement.classList.add("js");
+    setTimeout(() => document.documentElement.classList.add("revealed"), 1500);
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="wrap masthead__row">
+      <a class="wordmark" href="#top" aria-label="Aayush Kumar, home">
+        <span class="wordmark__name">Aayush Kumar</span>
+        <span class="wordmark__tick" aria-hidden="true">AK</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#work">Work</a>
+        <a href="#experience">Experience</a>
+        <a href="#notes">Notes</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="theme" type="button" aria-label="Toggle dark mode">
+        <span class="theme__dot" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <span>AIRBUS <b>40,000</b> pilots/day</span>
+        <span>MEM <b class="dn">−23%</b> main thread</span>
+        <span>LOB <b class="up">19.0M</b> ops/s</span>
+        <span>ADD+CANCEL <b>33 ns</b></span>
+        <span>TESTS <b class="up">22/22</b></span>
+        <span>MUTANTS <b class="up">5/5</b> caught</span>
+        <span>CKA <b>certified</b></span>
+        <span>AIRBUS <b>40,000</b> pilots/day</span>
+        <span>MEM <b class="dn">−23%</b> main thread</span>
+        <span>LOB <b class="up">19.0M</b> ops/s</span>
+        <span>ADD+CANCEL <b>33 ns</b></span>
+        <span>TESTS <b class="up">22/22</b></span>
+        <span>MUTANTS <b class="up">5/5</b> caught</span>
+        <span>CKA <b>certified</b></span>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero wrap" id="top">
+      <div class="hero__copy">
+        <p class="kicker reveal">Software Engineer · Airbus · C++ / Systems</p>
+        <h1 class="reveal">I build software that has to be <em>fast</em>, <em>predictable</em> and <em>correct</em>.</h1>
+        <p class="lede reveal">At Airbus I write C++/Qt for an iPad app used by 40,000 pilots a day. In my own time I'm building a matching engine and measuring it in nanoseconds.</p>
+        <div class="actions reveal">
+          <a class="btn btn--solid" href="Aayush_Kumar_Resume.pdf">Resume <span aria-hidden="true">↓</span></a>
+          <a class="btn" href="https://github.com/aayxshkumar">GitHub</a>
+          <a class="btn" href="mailto:aayushkumr25@gmail.com">Email</a>
+        </div>
+      </div>
+
+      <figure class="book reveal" aria-labelledby="book-cap">
+        <div class="book__head">
+          <span class="book__sym">LOB-ENGINE <span class="muted">/ SIM</span></span>
+          <span class="book__live"><i aria-hidden="true"></i><span id="book-status">Live</span></span>
+        </div>
+        <div class="book__mid">
+          <span class="muted">Mid</span>
+          <output id="mid" class="book__px">—</output>
+          <span class="muted">Spread</span>
+          <output id="spread" class="book__sp">—</output>
+        </div>
+        <div class="book__cols" aria-hidden="true"><span>Bid size</span><span>Price</span><span>Ask size</span></div>
+        <ol class="ladder" id="ladder" aria-label="Order book depth"></ol>
+        <div class="tape">
+          <div class="tape__label muted">Trades</div>
+          <ol id="tape" aria-live="off"></ol>
+        </div>
+        <div class="book__foot">
+          <span><output id="ops">0</output> ops</span>
+          <span><output id="fills">0</output> trades</span>
+          <button type="button" id="book-toggle" class="linkbtn">Pause</button>
+        </div>
+        <figcaption id="book-cap">Simulated order flow, matched in your browser using lob-engine's price-time priority rules. The real C++ benchmarks are <a href="#work">below</a>.</figcaption>
+      </figure>
+    </section>
+
+    <!-- NUMBERS -->
+    <section class="stats wrap" aria-label="Highlights">
+      <div class="stat"><span class="stat__n">40,000</span><span class="stat__l">pilots use the Airbus app I work on, daily</span></div>
+      <div class="stat"><span class="stat__n">−23%</span><span class="stat__l">main-thread memory, after profiling with Instruments</span></div>
+      <div class="stat"><span class="stat__n">19.0M</span><span class="stat__l">order-book ops/s, v0 baseline on an M4</span></div>
+      <div class="stat"><span class="stat__n">CKA</span><span class="stat__l">Certified Kubernetes Administrator</span></div>
+    </section>
+
+    <!-- WORK -->
+    <section class="section wrap" id="work" aria-labelledby="work-h">
+      <header class="section__head">
+        <span class="section__no">01</span>
+        <h2 id="work-h">Selected work</h2>
+      </header>
+
+      <article class="feature">
+        <div class="feature__copy">
+          <p class="kicker">Flagship · C++20</p>
+          <h3><a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a></h3>
+          <p>A limit order book and matching engine with price-time priority. Orders come from a pre-allocated pool and are chained per price level in intrusive lists, so there's no allocation per order and cancels are O(1).</p>
+          <p>I trust a test suite only once I've seen it fail, so every operation is checked against a deliberately naive reference book. Then I planted five bugs by hand to make sure the tests catch them. They caught all five.</p>
+          <ul class="tags" aria-label="Stack">
+            <li>C++20</li><li>CMake</li><li>GoogleTest</li><li>Google Benchmark</li><li>ASan / UBSan</li><li>GitHub Actions</li>
+          </ul>
+          <a class="arrow" href="https://github.com/aayxshkumar/lob-engine">Read the code and design notes <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="feature__data">
+          <table class="bench">
+            <caption>v0 baseline · Apple M4 · clang 17 · -O3</caption>
+            <thead><tr><th scope="col">Operation</th><th scope="col">p99</th><th scope="col">p99.9</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">add_limit</th><td>125 ns</td><td>750 ns</td></tr>
+              <tr><th scope="row">cancel</th><td>333 ns</td><td>667 ns</td></tr>
+              <tr><th scope="row">add_market</th><td>167 ns</td><td>416 ns</td></tr>
+            </tbody>
+          </table>
+          <dl class="kv">
+            <div><dt>Mixed workload, 1M ops</dt><dd>19.0M ops/s</dd></div>
+            <div><dt>Add + cancel, warm book</dt><dd>33 ns</dd></div>
+            <div><dt>Differential test</dt><dd>20,000 steps</dd></div>
+          </dl>
+          <p class="fine">Next: a flat price-level array instead of <code>std::map</code>, a lock-free SPSC feed, and replay of real Binance depth data.</p>
+        </div>
+      </article>
+
+      <div class="cards">
+        <article class="card">
+          <p class="kicker">TypeScript · Agents</p>
+          <h3><a href="https://github.com/aayxshkumar/gemini-code">gemini-code</a></h3>
+          <p>A coding-agent CLI that drives Gemini through browser automation, with orchestrator and worker tabs, a tool registry and crash-resume. CI runs on Windows, Linux and macOS.</p>
+          <ul class="tags"><li>TypeScript</li><li>Playwright</li><li>CI matrix</li></ul>
+        </article>
+        <article class="card">
+          <p class="kicker">Product · Hardware</p>
+          <h3><a href="https://tracestudio.co/">Trace Studios</a></h3>
+          <p>A photo-booth platform: capture, digital sharing and Raspberry Pi thermal printing, with HMAC-signed uploads and sync between the cloud and the booth.</p>
+          <ul class="tags"><li>Next.js</li><li>Flask</li><li>Raspberry Pi</li><li>Supabase</li></ul>
+        </article>
+        <article class="card">
+          <p class="kicker">Python · Markets</p>
+          <h3><a href="https://github.com/aayxshkumar/ai-hedge-fund">ai-hedge-fund, extended</a></h3>
+          <p>I extended the open-source virattt/ai-hedge-fund to Indian equities: NSE/BSE data, Zerodha read-only login, and regime-aware signal fusion.</p>
+          <ul class="tags"><li>Python</li><li>LLM agents</li><li>NSE/BSE</li></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section wrap" id="experience" aria-labelledby="exp-h">
+      <header class="section__head">
+        <span class="section__no">02</span>
+        <h2 id="exp-h">Experience</h2>
+      </header>
+      <ol class="jobs">
+        <li class="job">
+          <div class="job__when">Nov 2025 — now</div>
+          <div class="job__what">
+            <h3>Software Developer 1 <span class="at">Airbus</span></h3>
+            <p>C++/Qt/QML iPad application for flight-operations workflows, used daily by 40,000 pilots. Cut main-thread memory by 23% after profiling with Instruments. Designed state machines for deterministic, traceable behaviour in safety-critical flows. Integrated a fine-tuned aviation small language model.</p>
+          </div>
+        </li>
+        <li class="job">
+          <div class="job__when">Jun — Nov 2025</div>
+          <div class="job__what">
+            <h3>DevOps Intern <span class="at">Airbus</span></h3>
+            <p>Proof of concept for migrating on-premises infrastructure to AWS (Lambda, S3, Route 53). Docker-based CI/CD pipelines, monitoring scripts and log-based troubleshooting.</p>
+          </div>
+        </li>
+        <li class="job">
+          <div class="job__when">Nov 2024 — Jun 2025</div>
+          <div class="job__what">
+            <h3>Software Developer <span class="at">Turing</span></h3>
+            <p>GitHub Actions pipelines that evaluated LLMs on backend, systems and debugging tasks. A Dockerized reinforcement-learning evaluation environment for Meta and Alibaba projects.</p>
+          </div>
+        </li>
+        <li class="job">
+          <div class="job__when">2021 — 2025</div>
+          <div class="job__what">
+            <h3>B.Tech, Computer Engineering <span class="at">NIT Kurukshetra</span></h3>
+            <p>Merged the notifications feature into the institute website. President of the SUC Dance Crew (35 members, 7 inter-college wins). Co-organiser of TEDxNITKKR.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- NOTES -->
+    <section class="section wrap" id="notes" aria-labelledby="notes-h">
+      <header class="section__head">
+        <span class="section__no">03</span>
+        <h2 id="notes-h">Lab notes</h2>
+      </header>
+      <div class="notes">
+        <article class="note">
+          <p class="kicker">Benchmarking · Oct 2026</p>
+          <h3>My p50 was exactly 42 ns. That was the clock, not the code.</h3>
+          <p>Apple Silicon's <code>steady_clock</code> ticks at 24 MHz, so every sample is a multiple of about 41.7 ns, and anything faster shows up as a single tick. Now the latency tool measures the clock's resolution first and warns when it's too coarse to trust. I use throughput runs for averages and Linux for percentiles.</p>
+        </article>
+        <article class="note">
+          <p class="kicker">Testing · Oct 2026</p>
+          <h3>My first differential test passed with a planted bug in it.</h3>
+          <p>The random flow crossed the spread so often that queues never formed, so priority bugs had nowhere to show up. Once I biased the flow towards passive orders and added explicit "grow at the same price" modifies, it caught 5 out of 5 planted bugs. Lesson: test your tests.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact wrap" id="contact" aria-labelledby="contact-h">
+      <h2 id="contact-h">Working on something where latency or correctness matters?</h2>
+      <p>I'm open to quant developer, low-latency C++ and infrastructure roles.</p>
+      <div class="actions">
+        <a class="btn btn--solid" href="mailto:aayushkumr25@gmail.com">aayushkumr25@gmail.com</a>
+        <a class="btn" href="https://linkedin.com/in/aayush-kumr">LinkedIn</a>
+        <a class="btn" href="https://github.com/aayxshkumar">GitHub</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot wrap">
+    <span>© <span id="year">2026</span> Aayush Kumar</span>
+    <span class="muted">Hand-built: HTML, CSS and about 220 lines of JS. No framework.</span>
+  </footer>
+
+  <script src="book.js" defer></script>
+</body>
+</html>
