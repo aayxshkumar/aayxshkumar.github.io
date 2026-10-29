@@ -60,6 +60,8 @@ table {
 th, td { text-align: left; padding: 0.3rem 1.2rem 0.3rem 0; border-bottom: 1px solid var(--rule); }
 th { font-weight: normal; color: var(--mut); }
 td + td, th + th { text-align: right; }
+/* A text column after the first (e.g. "Change") stays left-aligned. */
+td.t, th.t { text-align: left; }
 
 /* Figures and the stepper may run wider than the text column. */
 .wide { width: min(110ch, calc(100vw - max(16px, 8vw) - 16px)); }

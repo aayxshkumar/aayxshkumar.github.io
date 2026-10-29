@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From 21M to 68M ops/s: two changes to a C++ order book · Aayush Kumar</title>
+<meta name="description" content="Flat price-level arrays, a bitset, and an open-addressing table in place of std::unordered_map took a C++20 order book from 21.2M to 67.5M ops/s. One step made it slower first, and the benchmark was flattering unordered_map.">
+<link rel="canonical" href="https://aayxshkumar.github.io/order-book-3x.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://aayxshkumar.github.io/order-book-3x.html">
+<meta property="og:title" content="From 21M to 68M ops/s: two changes to a C++ order book">
+<meta property="og:description" content="One step made it slower first, and the benchmark was flattering std::unordered_map.">
+<meta property="og:image" content="https://aayxshkumar.github.io/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"From 21M to 68M ops/s: two changes to a C++ order book","datePublished":"2026-10-29","author":{"@type":"Person","name":"Aayush Kumar","url":"https://aayxshkumar.github.io/"}}
+</script>
+</head>
+<body>
+<main>
+<p><a href="./">Aayush Kumar</a></p>
+
+<h1>From 21M to 68M ops/s: two changes to a C++ order book</h1>
+<p class="mut"><time datetime="2026-10-29">29 October 2026</time></p>
+
+<p>I'm building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book in C++20, to learn how matching engines are made fast. This is a log of the first two optimisations, with the numbers at each step, the step that made things slower, the benchmark that turned out to be too kind, and a replay of 20 minutes of real exchange data.</p>
+
+<table>
+<thead><tr><th>Version</th><th class="t">Change</th><th>Mixed workload</th><th>Add + cancel</th></tr></thead>
+<tbody>
+<tr><td>v0</td><td class="t"><code>std::map</code> price levels</td><td>21.2M ops/s</td><td>32.6 ns</td></tr>
+<tr><td>v1</td><td class="t">flat arrays + a bitset</td><td>34.3M ops/s</td><td>28.5 ns</td></tr>
+<tr><td>v2</td><td class="t">open-addressing id table</td><td>67.5M ops/s</td><td>8.6 ns</td></tr>
+</tbody>
+</table>
+
+<p class="mut">Apple M4, Apple clang 17, <code>-O3</code>, median of 3 runs. The mixed workload is 1M operations from a seeded generator: 55% limit orders within 50 ticks of the mid price (a tenth of them crossing), 40% cancels and 5% market orders. It peaks at about 109,000 resting orders. Every version is in the repo and <code>lob_bench</code> runs them side by side.</p>
+
+<figure class="wide">
+<img src="steps.svg" alt="Bar chart of mixed-workload throughput. v0: 21.2M operations per second with sequential ids, 20.0M with random-looking ids. v1: 34.3M and 30.4M. v2: 67.5M and 60.1M." width="720" height="230">
+</figure>
+
+<h2>v0: the baseline, and how I know it's right</h2>
+
+<p>An order book keeps resting buy and sell orders sorted by price, and orders at the same price in arrival order. An incoming order that crosses the spread trades against the best opposite price first, oldest order first.</p>
+
+<p>v0 is the textbook version. Each side is a <code>std::map</code> from price to a level. Orders come from a pre-allocated pool, and each level chains its orders in an intrusive doubly linked list, so resting an order never allocates and a cancel is O(1) once the order is found. Finding it is a <code>std::unordered_map</code> from order id to pool slot.</p>
+
+<p>Before optimising anything I wanted a way to tell whether a faster version was still correct. The test suite includes a deliberately naive reference book (plain vectors, linear scans), and a differential test pushes 20,000 random operations through both, comparing every trade and the whole book after every step.</p>
+
+<p>My first version of that test passed with a bug planted in it. The random orders crossed the spread so often that queues never formed, so time-priority bugs had nothing to break. Biasing the flow towards passive orders and adding explicit "increase size at the same price" modifies fixed it. Since then I plant bugs by hand to check the tests catch them; it's 16 so far, and the tests catch all of them. You can step through five of them on the <a href="./#stepper">home page</a>.</p>
+
+<h2>v1: flat arrays, which made it slower first</h2>
+
+<p>Exchanges limit how far prices can move, so the price levels can live in a flat array indexed by tick: finding a level becomes one subtraction instead of a tree walk. I gave each side an array covering 65,536 ticks and cached the index of the best level.</p>
+
+<p>The cost moves to the moment the best level empties, when the next one has to be found. I added a benchmark for the case that should hurt: 50 asks spaced far apart, cleared one at a time by market orders.</p>
+
+<table>
+<thead><tr><th>Sparse sweep, 50 levels</th><th>v0 map</th><th>array, linear scan</th><th>array + bitset</th></tr></thead>
+<tbody>
+<tr><td>1-tick gaps</td><td>2.0 µs</td><td>22.5 µs</td><td>1.5 µs</td></tr>
+<tr><td>100-tick gaps</td><td>2.0 µs</td><td>3.0 µs</td><td>1.6 µs</td></tr>
+<tr><td>1,000-tick gaps</td><td>2.0 µs</td><td>14.8 µs</td><td>1.85 µs</td></tr>
+</tbody>
+</table>
+
+<p>The array was slower than the map, but the first row didn't make sense: with 1-tick gaps there's almost nothing to scan, yet it was the slowest. The cost didn't depend on the gap at all. When the last ask was cleared, the scan walked the whole 65,536-tick band looking for an ask that didn't exist. The book already counted its levels, so it now checks the count and skips the scan when a side is empty.</p>
+
+<p>That left real gaps. The fix is one bit per price level, set while the level has orders. Finding the next non-empty level then checks 64 levels per step with <code>std::countr_zero</code>, which beats following <code>std::map</code> pointers even with 1,000 empty ticks between levels.</p>
+
+<h2>v2: the benchmark was flattering <code>std::unordered_map</code></h2>
+
+<p>After v1, the largest cost left was looking orders up by id. Every add checks for a duplicate, every cancel looks the order up, and every fill removes one. <code>std::unordered_map</code> allocates a node per order, and each lookup follows a bucket pointer and then a node pointer.</p>
+
+<p>Before replacing it I looked at what the benchmark fed it. The generator numbered orders 1, 2, 3 and so on. That's unusually kind to <code>unordered_map</code>: with libc++, consecutive ids land in consecutive buckets, and nodes allocated one after another tend to sit close together in memory. Real venues send ids that look random. Scrambling the same ids with a bijective mixer (the splitmix64 finaliser, so they stay unique) cost v1 a quarter of its throughput, from 34.4M to 25.7M ops/s.</p>
+
+<p>The replacement, <a href="https://github.com/aayxshkumar/lob-engine/blob/main/include/lob/id_table.hpp"><code>IdTable</code></a>, is about 100 lines:</p>
+
+<ul>
+<li>A flat array of 16-byte entries, each an order id and a pool slot.</li>
+<li>Linear probing, kept at most half full, so a lookup usually touches one or two neighbouring entries.</li>
+<li>Fibonacci hashing: multiply the id by 2<sup>64</sup>/φ and keep the top bits. One multiply, and sequential ids still spread out.</li>
+<li>Backward-shift deletion instead of tombstones. When an entry is removed, later entries in the same run move back to fill the hole, so a book that runs all day doesn't fill up with dead entries.</li>
+<li>A fixed capacity, taken from the order pool, so it never rehashes.</li>
+</ul>
+
+<p>Backward shift is easy to get subtly wrong when a run wraps past the end of the array, so the table has its own differential test against <code>std::unordered_map</code>: 20 seeds of 20,000 inserts and erases in a 16-slot table, where nearly every run is long and many wrap. I planted four bugs in the deletion code and it caught all four. A fifth survived, and it took me a minute to see why: it swapped two checks in a way that can't change the result. That's an equivalent mutant, not a gap in the tests.</p>
+
+<p>The first benchmark result was confusing. With random ids, v2 was 40% faster. With sequential ids it was no faster at all. The benchmark sized the book for one million orders, so the table had 2<sup>21</sup> entries, 32 MB, far bigger than the cache, and every lookup was a cache miss. The workload never has more than 109,000 live orders. Sized for 256,000, the table is 8 MB, and v2 is roughly twice as fast as v1 with either kind of id.</p>
+
+<p>So the honest version of the result comes with a condition: a fixed table's memory follows the capacity you configure, not the orders you have. Size it for the peak you expect, not the biggest number you can think of.</p>
+
+<h2>On real data</h2>
+
+<p>A seeded generator is easy to fool yourself with, as the ids showed. So I recorded 20 minutes of Binance's public BTCUSDT feed (11,992 depth updates and 71,328 trades) with a <a href="https://github.com/aayxshkumar/lob-engine/blob/main/tools/record_binance.py">small recorder</a> that uses only Python's standard library. It follows Binance's procedure for keeping a local book and stops at the first sequence gap.</p>
+
+<p>Binance publishes price levels, not individual orders, so the replay has to invent orders that explain each change. A level that grows gets a new order for the difference. A level that shrinks loses size from its newest orders. A trade becomes an incoming order at the trade price, which fills the oldest orders there. After every update, the replay checks the book's top 10 levels on each side against the exchange's.</p>
+
+<p>The first version of that check found a bug in my translation. A single update can clear an ask and place a bid at the same price. Applying the bid first crosses the stale ask and invents a trade that never happened, so each update now applies its reductions before its additions.</p>
+
+<table>
+<thead><tr><th>20 minutes of BTCUSDT</th><th>v0 <code>std::map</code></th><th>v2</th></tr></thead>
+<tbody>
+<tr><td>Throughput, 562,850 order operations</td><td>15.9M ops/s</td><td>81.9M ops/s</td></tr>
+</tbody>
+</table>
+
+<p>That's 5.2×, more than on the synthetic workload, though I wouldn't read much into the difference: at most 4,203 orders were resting at once, so the whole book fits in cache. The mix was 54% adds, 40% cancels and 6% size reductions, close to what the generator produces.</p>
+
+<p>The top of book matched the exchange after 99.93% of updates. The other 0.07% come from the feed, not the book. Binance doesn't sequence trades against depth updates, so a trade sometimes arrives after the update that already includes it, and the replay removes that size twice until the next update for the level corrects it. Replaying the same recording without trades matches after every update.</p>
+
+<h2>What I can't measure yet</h2>
+
+<p>These are throughput numbers. Latency percentiles are harder on this machine: on Apple Silicon <code>steady_clock</code> ticks every 41.7 ns, so the fastest operations measure as zero or one tick. My latency tool measures the clock first and warns when it's too coarse, and it reports tick counts rather than pretending to have nanoseconds. Next I'm running on Linux with a TSC-based timer and <code>perf stat</code>, to get real percentiles and cache-miss counts for each version.</p>
+
+<p>The code, the benchmarks and the recorder are at <a href="https://github.com/aayxshkumar/lob-engine">github.com/aayxshkumar/lob-engine</a>. If you see something I've measured wrong, I'd like to hear about it: <a href="mailto:aayushkumr25@gmail.com">aayushkumr25@gmail.com</a>.</p>
+
+</main>
+<footer><p><a href="./">Home</a> · <a href="now.html">Now</a> · <a href="colophon.html">Colophon</a></p></footer>
+</body>
+</html>

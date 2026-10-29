@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 230" width="720" height="230" role="img" aria-labelledby="t" font-family="Charter, 'Bitstream Charter', Cambria, serif" font-size="13">
+<title id="t">Mixed-workload throughput by version, Apple M4: v0 21.2M, v1 34.3M, v2 67.5M operations per second with sequential ids; 20.0M, 30.4M, 60.1M with random-looking ids.</title>
+<style>.txt{fill:#111}.mut{fill:#555}.grid{stroke:#ddd}.seq{fill:#1f5fa8}.rnd{fill:#9dbbe0}@media (prefers-color-scheme: dark){.txt{fill:#e8e8e8}.mut{fill:#aaa}.grid{stroke:#333}.seq{fill:#7db2f0}.rnd{fill:#35567d}}</style>
+<line class="grid" x1="210.0" y1="26" x2="210.0" y2="190"/>
+<text class="mut" x="210.0" y="208" text-anchor="middle">0M</text>
+<line class="grid" x1="272.9" y1="26" x2="272.9" y2="190"/>
+<text class="mut" x="272.9" y="208" text-anchor="middle">10M</text>
+<line class="grid" x1="335.7" y1="26" x2="335.7" y2="190"/>
+<text class="mut" x="335.7" y="208" text-anchor="middle">20M</text>
+<line class="grid" x1="398.6" y1="26" x2="398.6" y2="190"/>
+<text class="mut" x="398.6" y="208" text-anchor="middle">30M</text>
+<line class="grid" x1="461.4" y1="26" x2="461.4" y2="190"/>
+<text class="mut" x="461.4" y="208" text-anchor="middle">40M</text>
+<line class="grid" x1="524.3" y1="26" x2="524.3" y2="190"/>
+<text class="mut" x="524.3" y="208" text-anchor="middle">50M</text>
+<line class="grid" x1="587.1" y1="26" x2="587.1" y2="190"/>
+<text class="mut" x="587.1" y="208" text-anchor="middle">60M</text>
+<line class="grid" x1="650.0" y1="26" x2="650.0" y2="190"/>
+<text class="mut" x="650.0" y="208" text-anchor="middle">70M</text>
+<text class="mut" x="430.0" y="226" text-anchor="middle">operations per second, mixed workload, 1M ops</text>
+<text class="txt" x="198" y="55" text-anchor="end">v0  std::map levels</text>
+<rect class="seq" x="210" y="38" width="133.3" height="18"/>
+<text class="txt" x="349.3" y="52">21.2M</text>
+<rect class="rnd" x="210" y="58" width="125.7" height="12"/>
+<text class="mut" x="341.7" y="69" font-size="11">20.0M</text>
+<text class="txt" x="198" y="107" text-anchor="end">v1  arrays + bitset</text>
+<rect class="seq" x="210" y="90" width="215.6" height="18"/>
+<text class="txt" x="431.6" y="104">34.3M</text>
+<rect class="rnd" x="210" y="110" width="191.1" height="12"/>
+<text class="mut" x="407.1" y="121" font-size="11">30.4M</text>
+<text class="txt" x="198" y="159" text-anchor="end">v2  + open-addressing ids</text>
+<rect class="seq" x="210" y="142" width="424.3" height="18"/>
+<text class="txt" x="640.3" y="156">67.5M</text>
+<rect class="rnd" x="210" y="162" width="377.8" height="12"/>
+<text class="mut" x="593.8" y="173" font-size="11">60.1M</text>
+<rect class="seq" x="210" y="8" width="12" height="10"/><text class="mut" x="228" y="17" font-size="12">sequential ids</text>
+<rect class="rnd" x="340" y="8" width="12" height="10"/><text class="mut" x="358" y="17" font-size="12">random-looking ids</text>
+</svg>

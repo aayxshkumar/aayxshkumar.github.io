@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aayush Kumar</title>
-<meta name="description" content="Software developer at Airbus (C++/Qt). Building lob-engine, a C++20 order book: 20.1M to 34.0M ops/s after replacing std::map price levels, checked by a differential test.">
+<meta name="description" content="Software developer at Airbus (C++/Qt). Building lob-engine, a C++20 order book: 21.2M to 67.5M ops/s in two measured steps, checked by a differential test and replayed on real Binance data.">
 <link rel="canonical" href="https://aayxshkumar.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://aayxshkumar.github.io/">
 <meta property="og:title" content="Aayush Kumar">
-<meta property="og:description" content="Notes from building lob-engine, a C++20 order book: 20.1M to 34.0M ops/s, and why my M4 latency percentiles are clock ticks.">
+<meta property="og:description" content="Notes from building lob-engine, a C++20 order book: 21.2M to 67.5M ops/s, and the benchmark that flattered std::unordered_map.">
 <meta property="og:image" content="https://aayxshkumar.github.io/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -31,33 +31,37 @@
 
 <p>I'm looking for quant developer, low-latency C++, infrastructure and backend roles.</p>
 
+<p>Latest write-up: <a href="order-book-3x.html">From 21M to 68M ops/s: two changes to a C++ order book</a>.</p>
+
 <p class="links"><a href="mailto:aayushkumr25@gmail.com">aayushkumr25@gmail.com</a> · <a href="https://github.com/aayxshkumar">GitHub</a> · <a href="https://linkedin.com/in/aayush-kumr">LinkedIn</a> · <a href="Aayush_Kumar_Resume.pdf">Résumé (PDF)</a></p>
 
 <h2 id="lob-engine">lob-engine</h2>
 
 <p>A limit order book with price-time priority. Orders come from a pre-allocated pool, and each price level keeps its orders in an intrusive list, so adding an order never allocates and cancelling one is O(1).</p>
 
-<p><strong>v1 replaced the <code>std::map</code> price levels</strong> with two flat arrays indexed by price tick, plus a bitset of which levels are non-empty. On a mixed workload of 1M operations (Apple M4, clang 17, <code>-O3</code>, median of 3 runs) it went from 20.1M to 34.0M operations per second.</p>
+<p><strong>v1 replaced the <code>std::map</code> price levels</strong> with two flat arrays indexed by price tick, plus a bitset of which levels are non-empty. <strong>v2 replaced <code>std::unordered_map</code></strong> for the id lookup with a flat open-addressing table. On a mixed workload of 1M operations (Apple M4, clang 17, <code>-O3</code>, median of 3 runs):</p>
 
 <table>
-<thead><tr><th>Benchmark</th><th>v0 <code>std::map</code></th><th>v1 array + bitset</th></tr></thead>
+<thead><tr><th>Benchmark</th><th>v0 <code>std::map</code></th><th>v1 arrays + bitset</th><th>v2 + id table</th></tr></thead>
 <tbody>
-<tr><td>Mixed workload, 1M ops</td><td>20.1M ops/s</td><td>34.0M ops/s</td></tr>
-<tr><td>Add + cancel, warm book</td><td>32.5 ns</td><td>28.5 ns</td></tr>
-<tr><td>Sparse book, 1,000-tick gaps</td><td>2.0 µs</td><td>1.85 µs</td></tr>
+<tr><td>Mixed workload, 1M ops</td><td>21.2M ops/s</td><td>34.3M ops/s</td><td>67.5M ops/s</td></tr>
+<tr><td>Same, random-looking ids</td><td>20.0M ops/s</td><td>30.4M ops/s</td><td>60.1M ops/s</td></tr>
+<tr><td>Add + cancel, warm book</td><td>32.6 ns</td><td>28.5 ns</td><td>8.6 ns</td></tr>
 </tbody>
 </table>
 
-<p>The first array version was <em>slower</em> on sparse books. It found the next price level by walking empty ticks one at a time, and when a side emptied completely it walked the whole 65,536-tick band. The bitset finds the next level 64 ticks at a time; the full-band walk was a bug, and the level count now catches it.</p>
+<p>Both steps had a catch. The first array version was <em>slower</em> on sparse books, because of a bug that walked the whole 65,536-tick band. And the benchmark numbered orders 1, 2, 3, which flattered <code>std::unordered_map</code>; with random-looking ids it lost a quarter of its speed. <a href="order-book-3x.html">The write-up</a> has both stories.</p>
+
+<p>On 20 minutes of real Binance BTCUSDT data, replayed as 562,850 order operations, v2 is 5.2× faster than v0, and its top 10 price levels match the exchange's after 99.93% of updates. The recorder uses only Python's standard library, and a strict version of the replay runs in CI.</p>
 
 <figure class="wide">
-<img src="latency-cdf-add_limit.svg" alt="Step chart of add_limit latency on an Apple M4. Both curves rise in steps every 41.7 nanoseconds. v1 reaches 34 percent at zero ticks against 15 percent for v0, and 99 percent by two ticks against three." width="720" height="360">
+<img src="latency-cdf-add_limit.svg" alt="Step chart of add_limit latency on an Apple M4. Both curves rise in steps every 41.7 nanoseconds. v2 completes 56 percent of adds within the same clock tick, against 16 percent for v0; both reach 99 percent by two ticks." width="720" height="360">
 <figcaption>Latency CDF for <code>add_limit</code>, 1M operations, Apple M4. Every step is one tick of the 24 MHz <code>steady_clock</code>, so these are tick counts, not nanoseconds. Data: <a href="https://github.com/aayxshkumar/lob-engine/tree/main/docs">m4-quantiles.csv</a>, plotted by <code>tools/plot_cdf.py</code>.</figcaption>
 </figure>
 
 <h3>Testing</h3>
 
-<p>Every operation is checked against a deliberately naive reference book over 20,000 random steps, and both the old and new books run the same 22 tests. My first version of that test passed with a bug planted in it: the random flow crossed the spread so often that queues never formed, so priority bugs had nowhere to show up. Once I biased the flow towards passive orders and added same-price size increases, it caught every bug I planted by hand, 12 so far across the matching rules, the array book and the bitset.</p>
+<p>Every operation is checked against a deliberately naive reference book over 20,000 random steps, and the old and new books run the same 22 tests. My first version of that test passed with a bug planted in it: the random flow crossed the spread so often that queues never formed, so priority bugs had nowhere to show up. Once I biased the flow towards passive orders and added same-price size increases, it caught every bug I planted by hand, 16 so far across the matching rules, the array book, the bitset and the id table.</p>
 
 <p>You can try five of them below. It's a JavaScript port of the matching rules replaying a short hand-written scenario; the C++ and the 20,000-step test are <a href="https://github.com/aayxshkumar/lob-engine/tree/main/tests">on GitHub</a>.</p>
 
@@ -90,6 +94,11 @@
 </section>
 
 <h2 id="log">Log</h2>
+
+<article class="entry">
+<h3><time datetime="2026-10-29">2026-10-29</time> · <a href="order-book-3x.html">From 21M to 68M ops/s: two changes to a C++ order book</a></h3>
+<p>The full story of v1 and v2, with the numbers at each step. The id table ran no faster with sequential ids until I noticed the benchmark had sized it at 32 MB for a workload that never holds more than 109,000 orders.</p>
+</article>
 
 <article class="entry">
 <h3><time datetime="2026-10">2026-10</time> · A benchmark found a full-band scan in my "faster" version</h3>
@@ -132,7 +141,7 @@
 
 </main>
 <footer>
-<p><a href="now.html">Now</a> · <a href="colophon.html">Colophon</a> · Updated <time datetime="2026-10-28">28 October 2026</time></p>
+<p><a href="now.html">Now</a> · <a href="colophon.html">Colophon</a> · Updated <time datetime="2026-10-29">29 October 2026</time></p>
 </footer>
 <script src="stepper.js" defer></script>
 </body>
