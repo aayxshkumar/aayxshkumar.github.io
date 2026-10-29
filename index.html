@@ -27,7 +27,7 @@
 
 <p>I'm a software developer at Airbus, where I write C++ and Qt/QML for an iPad app that 40,000 pilots use every day for flight-operations work. Profiling it with Instruments, I cut main-thread memory by 23%.</p>
 
-<p>Outside work I'm building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book and matching engine in C++20, and writing up what I measure as I go.</p>
+<p>Outside work I’m building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book in C++20. Two measured changes took it from 21.2M to 67.5M operations a second; it replays 20 minutes of real Binance BTCUSDT data 5.2× faster than its <code>std::map</code> baseline; and its differential test has caught all 16 bugs I planted.</p>
 
 <p>I'm looking for quant developer, low-latency C++, infrastructure and backend roles.</p>
 
@@ -44,9 +44,9 @@
 <table>
 <thead><tr><th>Benchmark</th><th>v0 <code>std::map</code></th><th>v1 arrays + bitset</th><th>v2 + id table</th></tr></thead>
 <tbody>
-<tr><td>Mixed workload, 1M ops</td><td>21.2M ops/s</td><td>34.3M ops/s</td><td>67.5M ops/s</td></tr>
-<tr><td>Same, random-looking ids</td><td>20.0M ops/s</td><td>30.4M ops/s</td><td>60.1M ops/s</td></tr>
-<tr><td>Add + cancel, warm book</td><td>32.6 ns</td><td>28.5 ns</td><td>8.6 ns</td></tr>
+<tr><th scope="row">Mixed workload, M ops/s</th><td>21.2</td><td>34.3</td><td><strong>67.5</strong></td></tr>
+<tr><th scope="row">Same, random-looking ids</th><td>20.0</td><td>30.4</td><td>60.1</td></tr>
+<tr><th scope="row">Add + cancel, warm book, ns</th><td>32.6</td><td>28.5</td><td><strong>8.6</strong></td></tr>
 </tbody>
 </table>
 
@@ -55,7 +55,7 @@
 <p>On 20 minutes of real Binance BTCUSDT data, replayed as 562,850 order operations, v2 is 5.2× faster than v0, and its top 10 price levels match the exchange's after 99.93% of updates. The recorder uses only Python's standard library, and a strict version of the replay runs in CI.</p>
 
 <figure class="wide">
-<img src="latency-cdf-add_limit.svg" alt="Step chart of add_limit latency on an Apple M4. Both curves rise in steps every 41.7 nanoseconds. v2 completes 56 percent of adds within the same clock tick, against 16 percent for v0; both reach 99 percent by two ticks." width="720" height="360">
+<picture><source media="(max-width: 600px)" srcset="latency-cdf-add_limit-narrow.svg"><img src="latency-cdf-add_limit.svg" alt="Step chart of add_limit latency on an Apple M4. Both curves rise in steps every 41.7 nanoseconds. v2 completes 56 percent of adds within the same clock tick, against 16 percent for v0; both reach 99 percent by two ticks." width="720" height="360"></picture>
 <figcaption>Latency CDF for <code>add_limit</code>, 1M operations, Apple M4. Every step is one tick of the 24 MHz <code>steady_clock</code>, so these are tick counts, not nanoseconds. Data: <a href="https://github.com/aayxshkumar/lob-engine/tree/main/docs">m4-quantiles.csv</a>, plotted by <code>tools/plot_cdf.py</code>.</figcaption>
 </figure>
 
@@ -65,14 +65,25 @@
 
 <p>You can try five of them below. It's a JavaScript port of the matching rules replaying a short hand-written scenario; the C++ and the 20,000-step test are <a href="https://github.com/aayxshkumar/lob-engine/tree/main/tests">on GitHub</a>.</p>
 
-<section id="stepper" class="stepper wide" aria-label="Differential test, step by step">
+<table class="bugs">
+<thead><tr><th>Planted bug</th><th>Caught at step</th><th class="t">What differed</th></tr></thead>
+<tbody>
+<tr><th scope="row">Limit order crosses one tick early</th><td>6 of 11</td><td class="t">lob-engine traded 1 @ 101.00; the reference didn’t trade</td></tr>
+<tr><th scope="row">Cancel leaves a stale level total</th><td>7 of 11</td><td class="t">bid 99.00 total: 10 against 6</td></tr>
+<tr><th scope="row">Growing an order keeps its queue place</th><td>8 of 11</td><td class="t">queue at 101.00: #1 #2 against #2 #1</td></tr>
+<tr><th scope="row">Trades print at the taker’s price</th><td>9 of 11</td><td class="t">fills at 101.50 against 101.00</td></tr>
+<tr><th scope="row">Market orders obey a zero limit</th><td>10 of 11</td><td class="t">no fill against 2 @ 101.00</td></tr>
+</tbody>
+</table>
+
+<section id="stepper" class="stepper wide" aria-label="Differential test, step by step" hidden>
   <p class="controls">
     <label for="bug">Planted bug</label>
     <select id="bug"></select>
     <button type="button" id="reset">Reset</button>
     <button type="button" id="prev">Prev</button>
     <button type="button" id="next">Next</button>
-    <button type="button" id="run">Run</button>
+    <button type="button" id="run">Run to first difference</button>
     <span id="count" class="mut"></span>
   </p>
   <div class="cols">
@@ -130,7 +141,7 @@
 <h2 id="other">Other things I've built</h2>
 
 <ul>
-<li><a href="https://github.com/aayxshkumar/gemini-code"><strong>gemini-code</strong></a>: a coding-agent CLI in TypeScript that drives Gemini through browser automation (Playwright), with orchestrator and worker tabs, a tool registry and crash-resume. CI runs on Windows, Linux and macOS.</li>
+<li><a href="https://github.com/aayxshkumar/gemini-code"><strong>gemini-code</strong></a>: my fork of <a href="https://github.com/Muruganandham18/gemini-code">Muruganandham18/gemini-code</a>, a TypeScript CLI that drives Gemini through browser automation. My releases (v0.8 to v0.13) added Windows-first support (Edge, PowerShell and cmd fallbacks, and a CI job that runs the installers on Windows), crash resume, multi-root workspaces and recovery from stalled or closed tabs.</li>
 <li><a href="https://tracestudio.co/"><strong>Trace Studios</strong></a>: a photo-booth platform with capture, digital sharing and thermal printing from a Raspberry Pi. Uploads are HMAC-signed and the booth syncs with the cloud.</li>
 <li><a href="https://github.com/aayxshkumar/ai-hedge-fund"><strong>ai-hedge-fund, extended</strong></a>: I extended virattt/ai-hedge-fund to Indian equities, with NSE/BSE data, a read-only Zerodha login and regime-aware signal fusion.</li>
 </ul>

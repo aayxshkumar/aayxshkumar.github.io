@@ -28,18 +28,18 @@
 <p>I'm building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book in C++20, to learn how matching engines are made fast. This is a log of the first two optimisations, with the numbers at each step, the step that made things slower, the benchmark that turned out to be too kind, and a replay of 20 minutes of real exchange data.</p>
 
 <table>
-<thead><tr><th>Version</th><th class="t">Change</th><th>Mixed workload</th><th>Add + cancel</th></tr></thead>
+<thead><tr><th>Version</th><th class="t">Change</th><th>Mixed, M ops/s</th><th>Add + cancel, ns</th></tr></thead>
 <tbody>
-<tr><td>v0</td><td class="t"><code>std::map</code> price levels</td><td>21.2M ops/s</td><td>32.6 ns</td></tr>
-<tr><td>v1</td><td class="t">flat arrays + a bitset</td><td>34.3M ops/s</td><td>28.5 ns</td></tr>
-<tr><td>v2</td><td class="t">open-addressing id table</td><td>67.5M ops/s</td><td>8.6 ns</td></tr>
+<tr><td>v0</td><td class="t"><code>std::map</code> price levels</td><td>21.2</td><td>32.6</td></tr>
+<tr><td>v1</td><td class="t">flat arrays + a bitset</td><td>34.3</td><td>28.5</td></tr>
+<tr><td>v2</td><td class="t">open-addressing id table</td><td><strong>67.5</strong></td><td><strong>8.6</strong></td></tr>
 </tbody>
 </table>
 
 <p class="mut">Apple M4, Apple clang 17, <code>-O3</code>, median of 3 runs. The mixed workload is 1M operations from a seeded generator: 55% limit orders within 50 ticks of the mid price (a tenth of them crossing), 40% cancels and 5% market orders. It peaks at about 109,000 resting orders. Every version is in the repo and <code>lob_bench</code> runs them side by side.</p>
 
 <figure class="wide">
-<img src="steps.svg" alt="Bar chart of mixed-workload throughput. v0: 21.2M operations per second with sequential ids, 20.0M with random-looking ids. v1: 34.3M and 30.4M. v2: 67.5M and 60.1M." width="720" height="230">
+<picture><source media="(max-width: 600px)" srcset="steps-narrow.svg"><img src="steps.svg" alt="Bar chart of mixed-workload throughput. v0: 21.2M operations per second with sequential ids, 20.0M with random-looking ids. v1: 34.3M and 30.4M. v2: 67.5M and 60.1M." width="720" height="230"></picture>
 </figure>
 
 <h2>v0: the baseline, and how I know it's right</h2>
@@ -59,11 +59,11 @@
 <p>The cost moves to the moment the best level empties, when the next one has to be found. I added a benchmark for the case that should hurt: 50 asks spaced far apart, cleared one at a time by market orders.</p>
 
 <table>
-<thead><tr><th>Sparse sweep, 50 levels</th><th>v0 map</th><th>array, linear scan</th><th>array + bitset</th></tr></thead>
+<thead><tr><th>Sparse sweep, 50 levels, µs</th><th>v0 map</th><th>array, linear scan</th><th>array + bitset</th></tr></thead>
 <tbody>
-<tr><td>1-tick gaps</td><td>2.0 µs</td><td>22.5 µs</td><td>1.5 µs</td></tr>
-<tr><td>100-tick gaps</td><td>2.0 µs</td><td>3.0 µs</td><td>1.6 µs</td></tr>
-<tr><td>1,000-tick gaps</td><td>2.0 µs</td><td>14.8 µs</td><td>1.85 µs</td></tr>
+<tr><td>1-tick gaps</td><td>2.0</td><td>22.5</td><td>1.5</td></tr>
+<tr><td>100-tick gaps</td><td>2.0</td><td>3.0</td><td>1.6</td></tr>
+<tr><td>1,000-tick gaps</td><td>2.0</td><td>14.8</td><td>1.85</td></tr>
 </tbody>
 </table>
 

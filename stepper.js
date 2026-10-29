@@ -9,6 +9,7 @@
   "use strict";
   const root = document.getElementById("stepper");
   if (!root) return;
+  root.hidden = false;
 
   // A hand-written scenario (prices in ticks of 0.01). The C++ test runs
   // 20,000 random steps; this is short enough to read.
@@ -141,7 +142,8 @@
         const ka = la ? levelKey(la) : "", kb = lb ? levelKey(lb) : "";
         if (ka !== kb) {
           const desc = (l) => (l ? `total ${l.total}, queue ${l.q.map((o) => "#" + o.id).join(" ") || "empty"}` : "no level");
-          return { what: "level", side: s, px: p, text: `At ${px(p)}: lob-engine has ${desc(la)}; the reference has ${desc(lb)}.` };
+          const cell = la && lb && la.total !== lb.total ? "total" : "queue";
+          return { what: "level", side: s, px: p, cell, text: `At ${px(p)}: lob-engine has ${desc(la)}; the reference has ${desc(lb)}.` };
         }
       }
     }
@@ -185,8 +187,11 @@
     const bids = [...book.B.keys()].sort((a, b) => b - a);
     const row = (s, p) => {
       const l = book[s].get(p);
-      const bad = d && d.what === "level" && d.side === s && d.px === p ? " class=\"bad\"" : "";
-      return `<tr${bad}><td class="${s === "S" ? "ask" : "bid"}">${s === "S" ? "ask" : "bid"}</td><td>${px(p)}</td><td>${l.total}</td><td class="q">${l.q.map((o) => `#${o.id}·${o.qty}`).join(" ")}</td></tr>`;
+      const hit = d && d.what === "level" && d.side === s && d.px === p;
+      const bad = hit ? " class=\"bad\"" : "";
+      const dt = hit && d.cell === "total" ? " class=\"diff\"" : "";
+      const dq = hit && d.cell === "queue" ? " diff" : "";
+      return `<tr${bad}><td class="${s === "S" ? "ask" : "bid"}">${s === "S" ? "ask" : "bid"}</td><td>${px(p)}</td><td${dt}>${l.total}</td><td class="q${dq}">${l.q.map((o) => `#${o.id}·${o.qty}`).join(" ")}</td></tr>`;
     };
     for (const p of asks) rows.push(row("S", p));
     if (asks.length && bids.length) rows.push('<tr class="gap"><td colspan="4"></td></tr>');
@@ -195,7 +200,9 @@
       ? book.trades.map((t) => `#${t.maker} filled ${t.qty} @ ${px(t.px)}`).join("; ")
       : "none";
     el.querySelector("tbody").innerHTML = rows.join("") || '<tr><td colspan="4" class="mut">empty book</td></tr>';
-    el.querySelector(".trades").textContent = `Trades this step: ${trades}`;
+    const tr = el.querySelector(".trades");
+    tr.textContent = `Trades this step: ${trades}`;
+    tr.classList.toggle("bad", !!(d && d.what === "trades"));
   }
 
   function render() {
@@ -209,22 +216,29 @@
       else li.removeAttribute("aria-current");
     });
     $("#count").textContent = `Step ${step} of ${OPS.length}`;
-    $("#prev").disabled = step === 0;
-    $("#next").disabled = step === OPS.length;
+    $("#prev").setAttribute("aria-disabled", String(step === 0));
+    $("#next").setAttribute("aria-disabled", String(step === OPS.length));
+    const where = step ? `Step ${step} of ${OPS.length}, ${opText(OPS[step - 1])}. ` : "";
     if (s.first && s.first.step <= step) {
       out.className = "verdict bad";
-      out.textContent = `Step ${s.first.step}: the books differ. ${s.first.text}`;
+      out.textContent = `Step ${s.first.step}, ${opText(OPS[s.first.step - 1])}: the books differ. ${s.first.text}`;
     } else if (step === OPS.length) {
       out.className = "verdict ok";
-      out.textContent = bug === "none" ? "All steps match the reference." : "No difference found. This bug survived the scenario.";
+      out.textContent = where + (bug === "none" ? "All steps match the reference." : "No difference found. This bug survived the scenario.");
     } else {
       out.className = "verdict";
-      out.textContent = step === 0 ? "Press Next, or Run." : "The books match so far.";
+      out.textContent = step === 0 ? "Press Next (or the → key), or Run to first difference." : where + "The books match so far.";
     }
   }
 
-  $("#prev").addEventListener("click", () => { step = Math.max(0, step - 1); render(); });
-  $("#next").addEventListener("click", () => { step = Math.min(OPS.length, step + 1); render(); });
+  const go = (n) => { step = Math.max(0, Math.min(OPS.length, n)); render(); };
+  $("#prev").addEventListener("click", () => go(step - 1));
+  $("#next").addEventListener("click", () => go(step + 1));
+  root.addEventListener("keydown", (e) => {
+    if (e.target === bugSel || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === "ArrowRight") { go(step + 1); e.preventDefault(); }
+    if (e.key === "ArrowLeft") { go(step - 1); e.preventDefault(); }
+  });
   $("#run").addEventListener("click", () => { step = firstDivergence(bugSel.value) ?? OPS.length; render(); });
   $("#reset").addEventListener("click", () => { step = 0; render(); });
   bugSel.addEventListener("change", () => { step = 0; render(); });

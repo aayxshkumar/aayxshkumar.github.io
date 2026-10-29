@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 230" width="720" height="230" role="img" aria-labelledby="t" font-family="Charter, 'Bitstream Charter', Cambria, serif" font-size="13">
 <title id="t">Mixed-workload throughput by version, Apple M4: v0 21.2M, v1 34.3M, v2 67.5M operations per second with sequential ids; 20.0M, 30.4M, 60.1M with random-looking ids.</title>
-<style>.txt{fill:#111}.mut{fill:#555}.grid{stroke:#ddd}.seq{fill:#1f5fa8}.rnd{fill:#9dbbe0}@media (prefers-color-scheme: dark){.txt{fill:#e8e8e8}.mut{fill:#aaa}.grid{stroke:#333}.seq{fill:#7db2f0}.rnd{fill:#35567d}}</style>
+<style>.txt{fill:#111}.mut{fill:#555}.grid{stroke:#ddd}.seq{fill:#1f5fa8}.rnd{fill:none;stroke:#1f5fa8;stroke-width:1.5}@media (prefers-color-scheme: dark){.txt{fill:#e8e8e8}.mut{fill:#aaa}.grid{stroke:#333}.seq{fill:#7db2f0}.rnd{fill:none;stroke:#7db2f0}}</style>
 <line class="grid" x1="210.0" y1="26" x2="210.0" y2="190"/>
 <text class="mut" x="210.0" y="208" text-anchor="middle">0M</text>
 <line class="grid" x1="272.9" y1="26" x2="272.9" y2="190"/>

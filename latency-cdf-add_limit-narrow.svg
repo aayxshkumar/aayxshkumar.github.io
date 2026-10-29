@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 250" width="360" height="250" role="img" font-family="Charter, 'Bitstream Charter', Cambria, serif" font-size="12">
+<style>.bg{fill:#fff}.ax{stroke:#111;stroke-width:1}.grid{stroke:#e5e5e5;stroke-width:1}.txt{fill:#111}.mut{fill:#555}.s0{stroke:#B3261E}.s1{stroke:#1F5FA8}.line{fill:none;stroke-width:2}@media (prefers-color-scheme: dark){.bg{fill:#111}.ax{stroke:#e8e8e8}.grid{stroke:#2a2a2a}.txt{fill:#e8e8e8}.mut{fill:#aaa}.s0{stroke:#F2857C}.s1{stroke:#7DB2F0}}</style>
+<rect class="bg" width="360" height="250"/>
+<line class="grid" x1="40.0" y1="14" x2="40.0" y2="196"/><text class="mut" x="40.0" y="211" text-anchor="middle">0</text>
+<line class="grid" x1="110.4" y1="14" x2="110.4" y2="196"/><text class="mut" x="110.4" y="211" text-anchor="middle">42</text>
+<line class="grid" x1="180.7" y1="14" x2="180.7" y2="196"/><text class="mut" x="180.7" y="211" text-anchor="middle">83</text>
+<line class="grid" x1="251.1" y1="14" x2="251.1" y2="196"/><text class="mut" x="251.1" y="211" text-anchor="middle">125</text>
+<line class="grid" x1="321.5" y1="14" x2="321.5" y2="196"/><text class="mut" x="321.5" y="211" text-anchor="middle">167</text>
+<line class="grid" x1="40" y1="196.0" x2="344" y2="196.0"/><text class="mut" x="35" y="200.0" text-anchor="end">0%</text>
+<line class="grid" x1="40" y1="105.0" x2="344" y2="105.0"/><text class="mut" x="35" y="109.0" text-anchor="end">50%</text>
+<line class="grid" x1="40" y1="14.0" x2="344" y2="14.0"/><text class="mut" x="35" y="18.0" text-anchor="end">100%</text>
+<line class="ax" x1="40" y1="196" x2="344" y2="196"/><line class="ax" x1="40" y1="14" x2="40" y2="196"/>
+<text class="txt" x="192.0" y="230" text-anchor="middle">add_limit latency, ns (1 gridline = 1 tick)</text>
+<path class="line s0" d="M40.0,196.0H40.0V166.2H109.3V120.5H110.9V29.3H180.2V20.2H181.9V15.8H251.1V14.5H322.1V14.4H344.0"/>
+<path class="line s1" d="M40.0,196.0H40.0V95.0H109.3V70.6H110.9V21.5H180.2V16.9H181.9V14.5H251.1V14.2H344.0"/>
+<text class="txt" x="47.7" y="90.0">v2 56%</text>
+<text class="txt" x="47.7" y="161.2">v0 16%</text>
+</svg>

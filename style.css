@@ -13,7 +13,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #111; --ink: #e8e8e8; --mut: #aaa; --rule: #333;
+    --paper: #111; --ink: #e8e8e8; --mut: #aaa; --rule: #3a3a3a;
     --link: #8ab4f8; --visited: #c58af9;
     --bid: #7db2f0; --ask: #f2857c; --bad: #3a1d1b; --ok: #1d2e1b;
   }
@@ -24,7 +24,8 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font: 19px/1.55 Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+  font: 19px/1.5 Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+  container-type: inline-size;            /* FIX: lets .wide use 100cqw, which excludes a classic scrollbar */
 }
 main, footer {
   max-width: 66ch;
@@ -33,6 +34,8 @@ main, footer {
 }
 main { padding-top: 3.5rem; }
 
+h1, h2, h3 { line-height: 1.2; text-wrap: balance; }      /* FIX: headings no longer inherit 1.55 */
+p, li, figcaption { text-wrap: pretty; }
 h1 { font-size: 1.5em; margin: 0 0 1rem; }
 h2 { font-size: 1.25em; margin: 2.75rem 0 0.5rem; }
 h3 { font-size: 1em; margin: 1.75rem 0 0.25rem; }
@@ -41,8 +44,11 @@ p, ul { margin: 0 0 1rem; }
 ul { padding-left: 1.2em; }
 li { margin-bottom: 0.5rem; }
 
-a { color: var(--link); }
+a { color: var(--link); text-underline-offset: 0.15em; text-decoration-thickness: 0.06em; }
+a:hover { text-decoration-thickness: 0.12em; }
 a:visited { color: var(--visited); }
+.links a:visited, footer a:visited, main > p:first-child a:visited { color: var(--link); }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .links { margin-top: 1.25rem; }
 .mut { color: var(--mut); }
 
@@ -59,14 +65,17 @@ table {
 }
 th, td { text-align: left; padding: 0.3rem 1.2rem 0.3rem 0; border-bottom: 1px solid var(--rule); }
 th { font-weight: normal; color: var(--mut); }
-td + td, th + th { text-align: right; }
-/* A text column after the first (e.g. "Change") stays left-aligned. */
-td.t, th.t { text-align: left; }
+th[scope="row"] { color: var(--ink); }
+th + td, td + td, th + th { text-align: right; }
+th + td, td + td { white-space: nowrap; }                          /* FIX: never split "2.0 µs" */
+td.t, th.t { text-align: left; white-space: normal; }
+td:last-child, th:last-child { padding-right: 0; }
 
-/* Figures and the stepper may run wider than the text column. */
-.wide { width: min(110ch, calc(100vw - max(16px, 8vw) - 16px)); }
+.wide { width: min(110ch, calc(100vw - max(16px, 8vw) - 16px)); }   /* fallback */
+.wide { width: min(110ch, calc(100cqw - max(16px, 8vw) - 16px)); }  /* FIX: no 1-3px overflow under a classic scrollbar */
 figure { margin: 1.5rem 0; }
-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
+figure img { display: block; width: 100%; height: auto; }
+figure.wide img { max-width: 900px; }                      /* FIX: chart labels top out at 13px x 1.25 = 16.25px */
 figcaption { font-size: 0.85em; color: var(--mut); margin-top: 0.5rem; max-width: 66ch; }
 
 .entry h3 time { font-weight: normal; color: var(--mut); }
@@ -81,33 +90,51 @@ select, button {
   background: var(--paper);
   border: 1px solid var(--mut);
   border-radius: 2px;
-  padding: 0.25rem 0.5rem;
+  padding: 0.3rem 0.6rem;
+  min-height: 2rem;
 }
-button:disabled { opacity: 0.4; }
-button:not(:disabled) { cursor: pointer; }
+button[aria-disabled="true"] { opacity: 0.45; cursor: default; }
+button:not([aria-disabled="true"]) { cursor: pointer; }
+button:not([aria-disabled="true"]):hover { background: color-mix(in srgb, var(--ink) 6%, var(--paper)); }
 .cols { display: grid; grid-template-columns: minmax(14rem, 1fr) 2.2fr; gap: 1.5rem; margin-top: 0.75rem; }
-.ops { font-size: 0.78em; margin: 0; padding-left: 2.2em; color: var(--mut); }
+.ops { font-size: 0.78em; margin: 0; padding-left: 4.5ch; color: var(--mut); }
 .ops li { margin: 0 0 0.15rem; }
 .ops li.done { color: var(--ink); }
 .ops li[aria-current="step"] { font-weight: bold; }
 .books { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.book h4 { color: var(--ink); font-weight: bold; }
 .book table { width: 100%; margin: 0; font-size: 0.74em; }
 .book td, .book th { padding: 0.15rem 0.5rem 0.15rem 0; }
+.book td:nth-child(3), .book th:nth-child(3) { padding-right: 1.25rem; }
 .book td.q { text-align: left; }
 .book th:last-child { text-align: left; }
 .book .bid { color: var(--bid); }
 .book .ask { color: var(--ask); }
 .book tr.gap td { border-bottom: 2px solid var(--rule); padding: 0; }
 .book tr.bad td { background: var(--bad); }
+.book tr.bad td:first-child { box-shadow: inset 3px 0 0 var(--ask); padding-left: 0.5rem; }
+.book td.diff { font-weight: bold; text-decoration: underline; text-decoration-color: var(--ask); text-underline-offset: 0.2em; }
 .book .trades { font-size: 0.75em; margin: 0.4rem 0 0; }
+.book .trades.bad { background: var(--bad); box-shadow: inset 3px 0 0 var(--ask); padding: 0.2rem 0.5rem; color: var(--ink); }
 .verdict { margin: 0.75rem 0 0; font-size: 0.9em; min-height: 1.5em; }
-.verdict.bad { background: var(--bad); padding: 0.35rem 0.5rem; }
+.verdict.bad { background: var(--bad); padding: 0.35rem 0.5rem; box-shadow: inset 3px 0 0 var(--ask); }
 .verdict.ok { background: var(--ok); padding: 0.35rem 0.5rem; }
 
 footer { margin-top: 3rem; padding: 1rem 0 2.5rem; border-top: 1px solid var(--rule); font-size: 0.85em; color: var(--mut); }
 
 @media (max-width: 760px) {
-  body { font-size: 17px; }
+  body { font-size: 17px; line-height: 1.5; }
+  main, footer { margin-left: 16px; }                     /* FIX: 16px gutters on both sides */
   main { padding-top: 2rem; }
+  .wide { width: auto; }
+  th, td { padding-right: 0.75rem; }
   .cols, .books { grid-template-columns: 1fr; }
+  /* Stepper on a phone: controls stay on screen, verdict sits under them, books before the op list */
+  .stepper { display: flex; flex-direction: column; }
+  .controls { position: sticky; top: 0; z-index: 1; background: var(--paper); padding: 0.5rem 0; }
+  .controls label { flex-basis: 100%; }
+  #bug { flex: 1 1 100%; min-width: 0; max-width: 100%; }
+  select, button { font-size: 16px; min-height: 44px; padding: 0.5rem 0.8rem; }   /* no iOS focus zoom, 44px targets */
+  .verdict { order: 1; }
+  .cols { order: 2; display: flex; flex-direction: column-reverse; }
 }
