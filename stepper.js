@@ -13,6 +13,7 @@
   const root = document.getElementById("stepper");
   if (!root) return;
   root.hidden = false;
+  root.tabIndex = -1;   // a click inside keeps focus here, so the arrow keys keep working
 
   // A hand-written scenario (prices in ticks of 0.01). The C++ test runs
   // 20,000 random steps; this is short enough to read.
@@ -137,7 +138,7 @@
   const fills = (book) => {
     const by = new Map();
     for (const t of book.trades) by.set(t.px, (by.get(t.px) || 0) + t.qty);
-    return [...by].map(([p, q]) => `${q} @ ${px(p)}`).join(" and ");
+    return [...by].map(([p, q]) => `${q} \u2060@ \u2060${px(p)}`).join(" and ");
   };
   const sideName = (s) => (s === "S" ? "ask" : "bid");
 
@@ -219,7 +220,7 @@
       if (bad) first = false;
       const dt = bad && d.cell === "total" ? ' class="diff"' : "";
       const dq = bad && d.cell === "queue" ? " diff" : "";
-      return `<tr${bad ? ' class="bad"' : ""}><td class="${sideName(s)}">${sideName(s)}</td><td>${px(p)}</td>` +
+      return `<tr${bad ? ' class="bad"' : ""}><th scope="row" class="${sideName(s)}">${sideName(s)}</th><th scope="row">${px(p)}</th>` +
         `<td${dt}>${la ? la.total : "–"}</td><td class="q${dq}">${queue(la)}</td>` +
         `<td class="eq${same ? "" : " ne"}">${same ? EQ : NE}</td>` +
         `<td${dt}>${lb ? lb.total : "–"}</td><td class="q${dq}">${queue(lb)}</td></tr>`;
@@ -229,14 +230,14 @@
     const rows = asks.map((p) => row("S", p));
     if (asks.length || bids.length) {
       const sa = spread(mine), sb = spread(ref);
-      rows.push(`<tr class="spread"><td>spread</td><td></td><td>${sa}</td><td></td>` +
+      rows.push(`<tr class="spread"><th scope="row">spread</th><td></td><td>${sa}</td><td></td>` +
         `<td class="eq${sa === sb ? "" : " ne"}">${sa === sb ? EQ : NE}</td><td>${sb}</td><td></td></tr>`);
     }
     rows.push(...bids.map((p) => row("B", p)));
     table.tBodies[0].innerHTML = rows.join("") || '<tr><td colspan="7" class="mut">Both books are empty.</td></tr>';
     const fa = fills(mine) || "none", fb = fills(ref) || "none";
     const tbad = !!(d && d.what === "trades");
-    table.tFoot.innerHTML = `<tr${tbad ? ' class="bad"' : ""}><td>trades</td><td colspan="3">${fa}</td>` +
+    table.tFoot.innerHTML = `<tr${tbad ? ' class="bad"' : ""}><th scope="row">trades</th><td colspan="3">${fa}</td>` +
       `<td class="eq${fa === fb ? "" : " ne"}">${fa === fb ? EQ : NE}</td><td colspan="2">${fb}</td></tr>`;
   }
 
@@ -298,7 +299,16 @@
   document.querySelectorAll("#bugs tbody tr").forEach((tr) => {
     const k = keys.findIndex((key) => BUGS[key] === tr.cells[0].textContent.trim());
     const cell = tr.cells[1], m = /^(\d+)/.exec(cell.textContent);
-    if (k > 0 && m) cell.innerHTML = `<a href="#bug=${k}&step=${m[1]}">${cell.textContent}</a>`;
+    if (k > 0 && m) {
+      cell.innerHTML = `<a href="#bug=${k}&step=${m[1]}">${cell.textContent}</a>`;
+      // Following the link that is already in the address bar fires no hashchange, so handle it here.
+      const a = cell.firstChild;
+      a.addEventListener("click", (e) => {
+        if (a.hash !== location.hash) return;
+        e.preventDefault();
+        fromHash(); render(false); root.scrollIntoView({ block: "start" });
+      });
+    }
   });
 
   const linked = fromHash();
@@ -307,3 +317,21 @@
   addEventListener("pageshow", (e) => { if (e.persisted && fromHash()) render(false); });
   addEventListener("hashchange", () => { if (fromHash()) { render(false); root.scrollIntoView({ block: "start" }); } });
 })();
+
+// Method notes: keep the open note and its number both on screen, and close the note
+// when keyboard focus leaves it or its "Full receipt" link is followed.
+document.querySelectorAll(".method").forEach((p) => {
+  const b = document.querySelector(`[popovertarget="${p.id}"]`);
+  p.addEventListener("toggle", (e) => {
+    if (e.newState !== "open") return;
+    requestAnimationFrame(() => {
+      const s = p.getBoundingClientRect(), r = b.getBoundingClientRect();
+      if (getComputedStyle(p).position === "fixed") { if (r.bottom > s.top - 8) scrollBy(0, r.bottom - s.top + 16); }
+      else if (s.bottom > innerHeight) scrollBy(0, s.bottom - innerHeight + 16);
+    });
+  });
+  p.addEventListener("focusout", (e) => {
+    if (e.relatedTarget && !p.contains(e.relatedTarget) && e.relatedTarget !== b) p.hidePopover();
+  });
+  p.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", () => p.hidePopover()));
+});

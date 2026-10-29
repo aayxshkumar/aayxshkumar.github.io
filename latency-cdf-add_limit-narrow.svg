@@ -1,27 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="360" height="300" role="img" aria-labelledby="t" font-family="Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="360" height="300" role="img" aria-labelledby="t" font-family="Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif" font-size="14">
 <title id="t">Latency CDF of add_limit on an Apple M4, in clock ticks. v0 reads 0 ticks for 16.4% of calls; v2 reads 0 ticks for 55.5% of calls.</title>
 <style>.ax{stroke:#171b20;stroke-width:1}.grid{stroke:#d5d8db;stroke-width:1}.txt{fill:#171b20}.mut{fill:#565b62}.s0{stroke:#af2b25}.s1{stroke:#175fa4}.t0{fill:#af2b25}.t1{fill:#175fa4}.line{fill:none;stroke-width:2}.s0.line{stroke-dasharray:5 3}.lbl{paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}@media (prefers-color-scheme: dark){.ax{stroke:#e5e8ec}.grid{stroke:#2f3338}.txt{fill:#e5e8ec}.mut{fill:#a7abb1}.s0{stroke:#f2897c}.s1{stroke:#79b6f4}.t0{fill:#f2897c}.t1{fill:#79b6f4}.lbl{stroke:#0d1013}}</style>
-<text class="mut" x="38" y="244.0" text-anchor="end">0%</text>
-<text class="mut" x="38" y="188.0" text-anchor="end">25%</text>
-<text class="mut" x="38" y="132.0" text-anchor="end">50%</text>
-<text class="mut" x="38" y="76.0" text-anchor="end">75%</text>
+<text class="mut" x="38" y="242.0" text-anchor="end">0%</text>
+<text class="mut" x="38" y="186.5" text-anchor="end">25%</text>
+<text class="mut" x="38" y="131.0" text-anchor="end">50%</text>
+<text class="mut" x="38" y="75.5" text-anchor="end">75%</text>
 <text class="mut" x="38" y="20.0" text-anchor="end">100%</text>
-<line class="grid" x1="46.0" y1="16" x2="46.0" y2="240"/>
-<text class="txt" x="46.0" y="258" text-anchor="middle">0</text>
-<text class="mut" x="46.0" y="273" text-anchor="middle" font-size="11">0 ns</text>
-<line class="grid" x1="146.0" y1="16" x2="146.0" y2="240"/>
-<text class="txt" x="146.0" y="258" text-anchor="middle">1</text>
-<text class="mut" x="146.0" y="273" text-anchor="middle" font-size="11">42 ns</text>
-<line class="grid" x1="246.0" y1="16" x2="246.0" y2="240"/>
-<text class="txt" x="246.0" y="258" text-anchor="middle">2</text>
-<text class="mut" x="246.0" y="273" text-anchor="middle" font-size="11">83 ns</text>
-<line class="grid" x1="346.0" y1="16" x2="346.0" y2="240"/>
-<text class="txt" x="346.0" y="258" text-anchor="middle">3</text>
-<text class="mut" x="346.0" y="273" text-anchor="end" font-size="11">125 ns</text>
-<line class="ax" x1="46" y1="240" x2="346" y2="240"/>
+<line class="grid" x1="46.0" y1="16" x2="46.0" y2="238"/>
+<text class="txt" x="46.0" y="257" text-anchor="middle">0</text>
+<line class="grid" x1="146.0" y1="16" x2="146.0" y2="238"/>
+<text class="txt" x="146.0" y="257" text-anchor="middle">1</text>
+<text class="mut" x="146.0" y="273" text-anchor="middle" font-size="13">42 ns</text>
+<line class="grid" x1="246.0" y1="16" x2="246.0" y2="238"/>
+<text class="txt" x="246.0" y="257" text-anchor="middle">2</text>
+<text class="mut" x="246.0" y="273" text-anchor="middle" font-size="13">83 ns</text>
+<line class="grid" x1="346.0" y1="16" x2="346.0" y2="238"/>
+<text class="txt" x="346.0" y="257" text-anchor="middle">3</text>
+<text class="mut" x="346.0" y="273" text-anchor="end" font-size="13">125 ns</text>
+<line class="ax" x1="46" y1="238" x2="346" y2="238"/>
 <text class="txt" x="196" y="294" text-anchor="middle">add_limit reading, clock ticks at or under</text>
-<path class="line s0" d="M46.0,240.0V203.3H146.0V34.8H246.0V18.2H346.0V16.7"/>
-<text class="lbl t0" x="54.0" y="196.3">v0 16.4%</text>
-<path class="line s1" d="M46.0,240.0V115.7H146.0V25.2H246.0V16.7H346.0V16.2"/>
-<text class="lbl t1" x="54.0" y="108.7">v2 55.5%</text>
+<path class="line s0" d="M46.0,238.0V201.6H146.0V34.6H246.0V18.2H346.0V16.7"/>
+<text class="lbl t0" x="54.0" y="194.6">v0 16.4%</text>
+<path class="line s1" d="M46.0,238.0V114.8H146.0V25.1H246.0V16.7H346.0V16.2"/>
+<text class="lbl t1" x="54.0" y="107.8">v2 55.5%</text>
 </svg>

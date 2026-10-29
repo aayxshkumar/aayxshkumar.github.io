@@ -18,7 +18,8 @@
       "v0_map/add_cancel",
       "v2/add_cancel",
       "v0_map/sparse_sweep/1000",
-      "v2/sparse_sweep/1000"
+      "v2/sparse_sweep/1000",
+      "v2/mixed/1000000/0"
     ]
   },
   "claims": {
@@ -33,7 +34,7 @@
       "sizing": "book sized for 262,144 orders",
       "published": [
         "README.md",
-        "2178cef"
+        "41bf158"
       ],
       "status": "rerun public at 129ef11",
       "used": [
@@ -59,7 +60,7 @@
       "sizing": "book sized for all 1M operations; v0 and v2 are sized for 262,144",
       "published": [
         "README.md",
-        "2178cef"
+        "41bf158"
       ],
       "status": "README only",
       "used": [
@@ -81,12 +82,12 @@
         "v2/mixed_random_ids/1000000/262144"
       ],
       "statistic": "median of 3 repetitions",
-      "sizing": "ids scrambled with the splitmix64 finaliser; v1 at ffe9956",
+      "sizing": "ids scrambled with the splitmix64 finaliser; the v1 figure is from a v1 build with scrambling that was never committed (ffe9956 has no random-id benchmark), and another run gave 25.7M",
       "published": [
         "README.md",
-        "2178cef"
+        "41bf158"
       ],
-      "status": "rerun public at 129ef11",
+      "status": "README only; v0, v2 rerun public at 129ef11",
       "used": [
         [
           "home",
@@ -98,6 +99,31 @@
         ]
       ],
       "rerun": "20.2M → 61.9M"
+    },
+    "c-oversized": {
+      "label": "v2 with the id table sized for 1M",
+      "value": "34.4M ops/s, against 34.4M for v1; rerun 37.7M",
+      "bench": [
+        "v2/mixed/1000000/0"
+      ],
+      "statistic": "median of 3 repetitions",
+      "sizing": "book and id table sized for all 1M operations (2^21 slots, 32 MB)",
+      "published": [
+        "README.md",
+        "2178cef"
+      ],
+      "status": "README only; v2 rerun public at 129ef11",
+      "used": [
+        [
+          "home",
+          "index.html#id-table"
+        ],
+        [
+          "write-up",
+          "order-book-3x.html#v2"
+        ]
+      ],
+      "rerun": "37.7M"
     },
     "c-passive": {
       "label": "Passive adds, 100k orders",
@@ -148,18 +174,18 @@
     },
     "c-sweep": {
       "label": "Sparse sweep, 50 levels",
-      "value": "2.0 µs map; 22.5 µs with the scan bug; 1.5–1.85 µs with the bitset",
+      "value": "2.0 µs map; v1 22.5 µs with the scan bug, 1.5–1.85 µs with the bitset; v2 1.28 µs at 1,000-tick gaps",
       "bench": [
         "v0_map/sparse_sweep/1000",
         "v2/sparse_sweep/1000"
       ],
       "statistic": "median of 3 repetitions",
-      "sizing": "the 22.5 µs and bitset rows are v1, at 0f928f8",
+      "sizing": "v1 numbers stated in the README at 0f928f8; the linear-scan builds were never committed (0a8bdc2 already has the bitset)",
       "published": [
         "README.md",
         "0f928f8"
       ],
-      "status": "README only",
+      "status": "README only; v0, v2 rerun public at 129ef11",
       "used": [
         [
           "home",
@@ -221,7 +247,7 @@
       "rerun": "99.93%"
     },
     "c-ticks": {
-      "label": "add_limit readings within one clock tick",
+      "label": "add_limit readings of 0 ticks",
       "value": "0 ticks: 55.5% v2, 16.4% v0",
       "command": "./build/lob_latency 1000000 --csv docs/m4-quantiles.csv",
       "data": [
@@ -238,7 +264,8 @@
           "write-up",
           "order-book-3x.html#ticks"
         ]
-      ]
+      ],
+      "sizing": "550,713 add_limit calls per book, the adds among 1M mixed operations; a 0 means no 41.7 ns tick fell inside the call"
     },
     "c-p99": {
       "label": "add_limit tail",
@@ -298,13 +325,13 @@
     },
     "c-tests": {
       "label": "Tests",
-      "value": "51 tests and a 20,000-step differential test",
+      "value": "51 tests; a differential test that compares depth at every price after every step, over 10 seeds",
       "command": "./build/lob_tests",
       "data": [
         "tests/",
-        "2178cef"
+        "41bf158"
       ],
-      "status": "public at 2178cef",
+      "status": "public at 41bf158",
       "used": [
         [
           "home",

@@ -28,12 +28,12 @@
 <p>From 1,152 px wide, every table and figure has its method beside it in the right margin: machine, compiler, statistic, commit, data file and script. On a narrower screen the same text is the caption. Each post ends with a dated list of revisions. Pages print to A4 with page numbers and link addresses, and the write-up is also a <a href="order-book-3x.pdf">PDF</a>.</p>
 
 <h2 id="numbers"><a href="#numbers">Numbers</a></h2>
-<p>Every number on the site is listed in <a href="receipts.json">receipts.json</a>, with what backs it, and the <a href="claims.html">claims ledger</a> is generated from that file by <code>build.py</code>. <code>build.py --check</code> fails if a page still carries a number this site has corrected.</p>
+<p>Every headline number on the site is listed in <a href="receipts.json">receipts.json</a>, with what backs it, and the <a href="claims.html">claims ledger</a> is generated from that file by <code>build.py</code>. <code>build.py --check</code> fails if a page still carries a number this site has corrected.</p>
 
 <h2 id="built"><a href="#built">How it’s built</a></h2>
-<p>A handful of HTML files, one stylesheet and two small scripts, served by GitHub Pages. No framework, no web fonts, no analytics, no cookies, and no requests to anyone else’s server. The charts are SVGs written by short Python scripts from lob-engine’s committed data. The step-through on the home page ports lob-engine’s matching rules to JavaScript, and does nothing until you click; without JavaScript, the table above it says the same thing.</p>
+<p>A handful of HTML files, one stylesheet and two small scripts, served by GitHub Pages. No framework, no web fonts, no analytics, no cookies, and no requests to anyone else’s server. The charts are SVGs written by short Python scripts, from lob-engine’s committed CSV or the numbers in its README. The step-through on the home page ports lob-engine’s matching rules to JavaScript, and does nothing until you click; without JavaScript, the table above it says the same thing.</p>
 <p>Pages prefetch on hover and cross-fade in Chrome and Safari; other browsers load them normally. Nothing animates if your system asks for reduced motion.</p>
-<p><!-- weight -->The home page is 17.5 KB of HTML, CSS and JavaScript, compressed, plus 1.1 KB for its chart and icon. It loads no fonts.<!-- /weight --></p>
+<p><!-- weight -->The home page is 18.9 KB of HTML, CSS and JavaScript, compressed, plus 1.1 KB for its chart and icon. It loads no fonts.<!-- /weight --></p>
 
 <h2 id="ai"><a href="#ai">AI</a></h2>
 <p>Much of the code in lob-engine and on this site was written with Claude Code, Anthropic’s AI coding assistant, working from my direction. So far that is every commit in both repositories, and each one says so in a <code>Co-Authored-By: Claude</code> trailer. The numbers come from runs on my own machine, and the <a href="claims.html">claims ledger</a> shows which of them you can check yourself.</p>

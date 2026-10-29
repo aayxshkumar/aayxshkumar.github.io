@@ -28,7 +28,7 @@ STYLE = (
 def main():
     out, narrow = sys.argv[1], "--narrow" in sys.argv[2:]
     if narrow:
-        W, L, R, T, ROW, fs = 360, 12, 46, 8, 70, 13
+        W, L, R, T, ROW, fs = 360, 12, 50, 8, 72, 14
     else:
         W, L, R, T, ROW, fs = 720, 200, 150, 10, 56, 15
     XMAX = 70.0

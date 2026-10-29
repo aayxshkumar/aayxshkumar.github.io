@@ -16,7 +16,7 @@
 
   --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
   --mono: ui-monospace, "SF Mono", Menlo, "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
-  --measure: 62ch;
+  --measure: 41rem;          /* 62ch of Charter at 19 px, as rem so it resolves once, not per element */
   --margin: 15rem;
   --gap: 2.5rem;
   --gutter: 16px;
@@ -78,9 +78,14 @@ ul { padding-left: 1.2em; }
 li { margin-bottom: .4rem; }
 .meta { font-size: .85em; color: var(--mut); margin-top: -.5rem; }
 .mut { color: var(--mut); }
+.print-only { display: none; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 code, kbd, pre { font-family: var(--mono); }
+sup, sub { line-height: 0; }
+:not(pre) > code { line-height: 1; }
+tbody th, td.t { text-wrap: balance; }
+.nw { white-space: nowrap; }
 code { font-size: 1em; font-size-adjust: 0.481; }       /* inline code as tall as the text around it */
 @supports not (font-size-adjust: 0.481) { code { font-size: .84em; } }
 
@@ -136,7 +141,7 @@ table code { font-size: 1em; }
 
 /* ---- Captions, figures, margin ----------------------------------------- */
 .cap, figcaption { font-size: .85em; line-height: 1.45; color: var(--mut); margin: .5rem 0 1.5rem; max-width: var(--measure); }
-.cap a, figcaption a { white-space: nowrap; }
+.cap a, figcaption a, .cap code, figcaption code { white-space: nowrap; }
 .cap b, figcaption b { color: var(--ink); font-weight: 400; }   /* the finding sentence */
 .withcap { margin: 1.5rem 0; }
 .withcap > table { margin: 0; }
@@ -146,7 +151,7 @@ table code { font-size: 1em; }
 @supports (width: 1cqw) { .wide { width: min(110ch, calc(100cqw - var(--left) - var(--gutter))); } }  /* no overflow under a classic scrollbar */
 figure { margin: 1.75rem 0; }
 figure img { display: block; width: 100%; height: auto; }
-figure.wide img { max-width: 900px; }
+figure.wide img { max-width: 720px; }
 
 /* Sidenotes: an indented block here, the margin from 72em. */
 .note {
@@ -172,27 +177,30 @@ button.num {
 .method:popover-open {            /* default and no-anchor fallback: a bottom sheet */
   display: block; box-sizing: border-box; position: fixed; inset: auto var(--gutter) var(--gutter) var(--gutter); margin: 0;
   max-height: 60vh; overflow: auto; height: auto; max-width: none;
-  padding: .6rem .8rem 3.5rem; font: .85rem/1.45 var(--serif); font-size-adjust: 0.481; font-weight: 400;
+  padding: .6rem .8rem 3.5rem; font: .85em/1.45 var(--serif); font-size-adjust: 0.481; font-weight: 400;
   text-align: left; white-space: normal; color: var(--ink); background: var(--paper);
   border: 1px solid var(--rule2); border-radius: 0; box-shadow: none;
 }
 @media (min-width: 47.5em) { @supports (position-area: block-end) {
-  .method:popover-open { position: absolute; inset: auto; margin: .35rem 0 0; max-width: min(24rem, calc(100vw - 32px));
+  .method:popover-open { position: absolute; inset: auto; margin: .35rem 0 0; max-width: min(24rem, calc(100vw - 32px)); min-width: min(20rem, calc(100vw - 32px));
     padding-bottom: .6rem; position-area: block-end span-inline-end; position-try-fallbacks: flip-inline; }
 } }
 .method .close {
   position: absolute; right: .5rem; bottom: .5rem; min-height: 44px; min-width: 44px;
   font: .9em/1.2 var(--serif); color: var(--ink); background: var(--paper); border: 1px solid var(--rule2); border-radius: 2px; cursor: pointer;
 }
-@media (min-width: 47.5em) and (pointer: fine) { @supports (position-area: block-end) {
+@media (min-width: 47.5em) { @supports (position-area: block-end) {
   .method .close { position: static; float: right; min-height: 24px; min-width: 0; margin: .25rem 0 0 .75rem; padding: .1rem .5rem; }
+} }
+@media (min-width: 47.5em) and (pointer: coarse) { @supports (position-area: block-end) {
+  .method .close { min-height: 44px; min-width: 44px; }
 } }
 .method a { white-space: nowrap; }
 .method::backdrop { background: transparent; }
 .endnotes { font-size: .9em; padding-left: 1.6em; }
 .endnotes li { margin-bottom: .6rem; }
 .endnotes b { font-weight: 700; }
-.endnotes .rcpt { display: grid; grid-template-columns: max-content 1fr; gap: 0 .75rem; margin: .2rem 0 .3rem; }
+.endnotes .rcpt { display: grid; grid-template-columns: 7.2em 1fr; gap: 0 .75rem; margin: .2rem 0 .3rem; }
 .endnotes .rcpt dt { color: var(--mut); }
 .endnotes .rcpt dd { margin: 0; }
 .endnotes .more { margin: 0; color: var(--mut); }
@@ -200,7 +208,7 @@ button.num {
 @media (max-width: 30em) { .endnotes .rcpt { grid-template-columns: 1fr; } .endnotes .rcpt dd { margin-bottom: .2rem; } }
 
 /* ---- Copy buttons (post and ledger) ------------------------------------- */
-.cmd { position: relative; }
+.cmd { display: grid; grid-template-columns: 1fr auto; column-gap: .75rem; align-items: end; }
 .copy {
   font: .8em/1.2 var(--serif); font-size-adjust: 0.481; color: var(--ink); background: var(--paper);
   border: 1px solid var(--rule2); border-radius: 2px; padding: .15rem .5rem; min-height: 24px; min-width: 6ch; cursor: pointer;
@@ -208,9 +216,11 @@ button.num {
 .copy .done { display: none; }
 .copy[data-copied] .done { display: inline; }
 .copy[data-copied] .idle { display: none; }
-.cmd .copy { position: absolute; top: .5rem; right: .5rem; }
-.cmd pre { padding-right: 5rem; }
-@media (max-width: 47.5em) { .copy { min-height: 44px; } }
+.cmd > .codecap { grid-column: 1; grid-row: 1; }
+.cmd > pre { grid-column: 1 / -1; grid-row: 2; }
+.cmd > .copy { grid-column: 2; grid-row: 1; margin: 0 0 .25rem; }
+@media (max-width: 47.5em), (pointer: coarse) { .copy { min-height: 44px; } }
+@media (pointer: coarse) { select, .stepper button { min-height: 44px; } }
 
 /* ---- Claims ledger ------------------------------------------------------ */
 .ledger { width: 100%; }
@@ -218,12 +228,13 @@ button.num {
 .ledger thead th.t { padding-left: 1.4rem; }
 .ledger td.t { white-space: normal; }
 .ledger .val { min-width: 9rem; }
-.ledger .used { display: block; color: var(--mut); font-size: .88em; }
+.ledger .used { display: block; color: var(--mut); font-size: .88em; font-weight: 400; }
 .ledger .ev { display: block; margin-bottom: .15rem; }
 .ledger tbody > tr > * { border-top: 1px solid var(--rule); }
 .ledger tbody tr:first-child > * { border-top: 0; }
-.ledger code { overflow-wrap: anywhere; }
-.statuses dt { font-weight: 700; }
+.ledger code { overflow-wrap: break-word; }
+@media (min-width: 47.5em) and (max-width: 71.99em) { main > .ledger.wide { width: min(110ch, calc(100cqw - var(--left) - var(--gutter))); max-width: none; } }
+.statuses dt { font-weight: 400; font-style: italic; }
 .statuses dd { margin: 0 0 .9rem; }
 @media (max-width: 47.5em) {
   table.stack, table.stack tbody, table.stack tr, table.stack th, table.stack td { display: block; width: auto; }
@@ -234,14 +245,14 @@ button.num {
   table.stack tbody tr:last-child { border-bottom: 1.5px solid var(--ink); }
   table.stack th[scope="row"] { font-weight: 700; margin-bottom: .25rem; }
   table.stack td { margin: .2rem 0 0; }
-  table.stack td::before { content: attr(data-label); display: block; color: var(--mut); font-size: .85em; }
+  table.stack td::before { content: attr(data-label); content: attr(data-label) / ""; display: block; color: var(--mut); font-size: .85em; }
   .ledger thead th.t { padding-left: 0; }
 }
 
 /* ---- Log --------------------------------------------------------------- */
 .log { list-style: none; padding: 0; margin: 0 0 1rem; }
-.log li { display: grid; grid-template-columns: 6.6em 1fr; column-gap: .75rem; margin: 0 0 .9rem; }
-.log .d { font-size: .9em; color: var(--mut); font-variant-numeric: tabular-nums; padding-top: .12em; text-decoration-line: none; }
+.log li { display: grid; grid-template-columns: 6.6em 1fr; column-gap: .75rem; margin: 0 0 .9rem; align-items: baseline; }
+.log .d { font-size: .9em; color: var(--mut); font-variant-numeric: tabular-nums; text-decoration-line: none; }
 .log .d:visited { color: var(--mut); }
 @media (hover: hover) { .log .d:hover { text-decoration-line: underline; } }
 .log p { grid-column: 2; margin: .1rem 0 0; font-size: .9em; color: var(--mut); }
@@ -250,10 +261,10 @@ button.num {
 @media (hover: hover) { .log .sha:hover { text-decoration-line: underline; } }
 @media (min-width: 47.5em) {
   .log li { grid-template-columns: 6.6em 1fr 5.5em; }
-  .log .sha { grid-column: 3; grid-row: 1; justify-self: end; padding-top: .2em; }
+  .log .sha { grid-column: 3; grid-row: 1; justify-self: end; }
 }
 
-.sections { font-size: .9em; }
+.sections { font-size: .9em; margin: 0 0 1rem; }
 .draft { color: var(--mut); border-left: 2px solid var(--rule); padding-left: .75rem; }
 .revisions { list-style: none; padding: 0; }
 .revisions li { margin-bottom: .6rem; }
@@ -278,8 +289,13 @@ button.num:hover { background: none; text-decoration-style: solid; }
 
 .stepper { scroll-margin-top: 1.5rem; margin: 1.5rem 0 1.75rem; padding: 1rem 0 .75rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
 .stepper > h3 { margin-top: 0; }
+html:not(.js) .stepper { display: none; }
+.stepper { min-height: 29rem; }                                     /* step-0 height, reserved before stepper.js runs */
+@media (min-width: 47.5em) and (max-width: 63.99em) { .stepper { min-height: 31.75rem; } }
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0; font-size: .9em; }
-.controls label { margin-right: .15rem; color: var(--mut); }
+.pick { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .5rem; margin: 0 0 .5rem; font-size: .9em; }
+.pick label { color: var(--mut); }
+.pick select { font-size: 1em; }
 .controls select, .controls button { font-size: 1em; }
 .cols { display: grid; grid-template-columns: minmax(14rem, 1fr) 2.6fr; gap: 1.75rem; margin-top: 1rem; }
 .bookwrap { min-width: 0; }
@@ -311,8 +327,17 @@ button.num:hover { background: none; text-decoration-style: solid; }
 .book tr.bad > :first-child { box-shadow: inset 3px 0 0 var(--ask); }
 .book .diff { text-decoration: underline 2px var(--ask); text-underline-offset: .22em; text-decoration-skip-ink: none; }
 .book tfoot tr.bad > * { color: var(--ink); }
+.book thead tr:first-child th:nth-child(1) { width: 3.6em; }
+.book thead tr:first-child th:nth-child(2) { width: 4.8em; }
+.book thead tr + tr th:not(.q) { width: 3.4em; }
+.book thead th.q { width: 30%; }
+.book thead tr + tr th:first-child { text-align: right; padding-left: 0; }
+.book .eq + *, .book thead tr + tr th:nth-child(3) { padding-left: .5rem; }
+.book tbody th { font-weight: 400; }
+.book tbody th + th { text-align: right; }
+.book tfoot th { font-weight: 400; }
 
-.verdict { margin: .85rem 0 0; font-size: .9em; min-height: 3.7em; min-height: calc(3lh + .7rem); padding: .3rem .5rem; }
+.verdict { margin: .85rem 0 0; font-size: .9em; min-height: 3.7em; min-height: calc(2lh + .7rem); padding: .3rem .5rem; }
 .verdict.bad { background: var(--bad); box-shadow: inset 3px 0 0 var(--ask); }
 
 /* ---- Footer ------------------------------------------------------------ */
@@ -337,10 +362,11 @@ footer p { margin: 0 0 .4rem; }
   /* The caption sits in the margin, its top level with the object's top rule (Tufte). */
   main > .withcap {
     display: grid; grid-template-columns: var(--measure) var(--margin); column-gap: var(--gap);
-    align-items: start; max-width: none; width: auto;
+    align-items: start; max-width: none; width: auto; clear: right;
   }
   .withcap > :not(.cap):not(figcaption) { grid-column: 1; grid-row: 1; min-width: 0; }
   .withcap > .cap, .withcap > figcaption { grid-column: 2; grid-row: 1; margin: 0; font-size: .8em; line-height: 1.45; }
+  #bugs + .stepper { border-top: 0; padding-top: 0; }
   figure.withcap.wide { width: auto; }
   figure.withcap img { max-width: none; }
   .note {
@@ -353,6 +379,7 @@ footer p { margin: 0 0 .4rem; }
 /* ---- Phones ------------------------------------------------------------ */
 @media (max-width: 47.5em) {
   body { font-size: 1.0625rem; }
+  :root { --measure: 36.6rem; }                                   /* 62ch at 17 px */
   main, footer { margin-left: var(--gutter); }                     /* 16 px on both sides */
   main { padding-top: 2rem; }
   h1 { font-size: 1.375rem; }
@@ -361,15 +388,18 @@ footer p { margin: 0 0 .4rem; }
   td.t { padding-left: .75rem; }
   .log li { grid-template-columns: 1fr; }
   .log p { grid-column: 1; }
+  .log .sha { grid-column: 1; padding: .3rem 0; }
+  .log .d { white-space: nowrap; }
   .cols { grid-template-columns: 1fr; }
   .book { font-size: .78em; }
   .book thead th, .book tbody td, .book tbody th, .book tfoot td, .book tfoot th { padding-right: .4rem; }
   .book .eq { padding-inline: .3rem; }
   /* The stepper on a phone: controls stay on screen, the verdict under them, books before the ops */
-  .stepper { display: flex; flex-direction: column; }
+  .stepper { display: flex; flex-direction: column; min-height: 46.5rem; }
   .controls { position: sticky; top: 0; z-index: 1; background: var(--paper); padding: .5rem 0; }
-  .controls label { flex-basis: 100%; }
-  #bug { flex: 1 1 100%; min-width: 0; max-width: 100%; }
+  .pick label { flex-basis: 100%; }
+  .pick #bug { flex: 1 1 100%; min-width: 0; max-width: 100%; }
+  .controls { border-bottom: 1px solid var(--rule); }
   select, .stepper button { font-size: 16px; min-height: 44px; padding: .5rem .8rem; }   /* no iOS focus zoom */
   .verdict { order: 1; min-height: 5.2em; min-height: calc(4lh + .7rem); }
   .cols { order: 2; display: flex; flex-direction: column-reverse; }
@@ -397,6 +427,10 @@ footer p { margin: 0 0 .4rem; }
   main, footer { max-width: none; margin: 0; }
   main { padding-top: 0; }
   main > * { max-width: none; }
+  main ul:not(.links):not(.log):not(.revisions) { padding-left: 1.2em; }
+  table.ledger { break-inside: auto; }
+  table.ledger tr { break-inside: avoid; }
+  .print-only { display: block; }
   .wide { width: auto; }
   .stepper, footer, .method, .noprint { display: none !important; }
   button.num { text-decoration: none; }

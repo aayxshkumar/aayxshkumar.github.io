@@ -1,28 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 262" width="360" height="262" role="img" aria-labelledby="t" font-family="Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 268" width="360" height="268" role="img" aria-labelledby="t" font-family="Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif" font-size="14">
 <title id="t">Mixed-workload throughput by version on an Apple M4, millions of operations a second. Sequential ids: v0 21.2, v1 34.3, v2 67.5. Random-looking ids: v0 20.0, v1 30.4, v2 60.1.</title>
 <style>.txt{fill:#171b20}.mut{fill:#565b62}.grid{stroke:#d5d8db}.v0{fill:#af2b25}.v1{fill:#565b62}.v2{fill:#175fa4}.o0{fill:none;stroke:#af2b25;stroke-width:1.5}.o1{fill:none;stroke:#565b62;stroke-width:1.5}.o2{fill:none;stroke:#175fa4;stroke-width:1.5}@media (prefers-color-scheme: dark){.txt{fill:#e5e8ec}.mut{fill:#a7abb1}.grid{stroke:#2f3338}.v0{fill:#f2897c}.v1{fill:#a7abb1}.v2{fill:#79b6f4}.o0{stroke:#f2897c}.o1{stroke:#a7abb1}.o2{stroke:#79b6f4}}</style>
-<line class="grid" x1="12.0" y1="8" x2="12.0" y2="218"/>
-<text class="mut" x="12.0" y="237" text-anchor="middle">0</text>
-<line class="grid" x1="98.3" y1="8" x2="98.3" y2="218"/>
-<text class="mut" x="98.3" y="237" text-anchor="middle">20</text>
-<line class="grid" x1="184.6" y1="8" x2="184.6" y2="218"/>
-<text class="mut" x="184.6" y="237" text-anchor="middle">40</text>
-<line class="grid" x1="270.9" y1="8" x2="270.9" y2="218"/>
-<text class="mut" x="270.9" y="237" text-anchor="middle">60</text>
-<text class="mut" x="163" y="256" text-anchor="middle">M operations a second, mixed workload of 1M operations</text>
-<text class="txt" x="12" y="21"><tspan font-weight="700">v0</tspan> std::map levels</text>
-<rect class="v0" x="12" y="27" width="91.5" height="18"/>
-<rect class="o0" x="12" y="49.0" width="86.3" height="12"/>
-<text class="txt" x="109.5" y="41">21.2</text>
-<text class="mut" x="104.3" y="59" font-size="12">20.0</text>
-<text class="txt" x="12" y="91"><tspan font-weight="700">v1</tspan> arrays + bitset</text>
-<rect class="v1" x="12" y="97" width="148.0" height="18"/>
-<rect class="o1" x="12" y="119.0" width="131.2" height="12"/>
-<text class="txt" x="166.0" y="111">34.3</text>
-<text class="mut" x="149.2" y="129" font-size="12">30.4</text>
-<text class="txt" x="12" y="161"><tspan font-weight="700">v2</tspan> + id table</text>
-<rect class="v2" x="12" y="167" width="291.2" height="18"/>
-<rect class="o2" x="12" y="189.0" width="259.3" height="12"/>
-<text class="txt" x="309.2" y="181">67.5</text>
-<text class="mut" x="277.3" y="199" font-size="12">60.1</text>
+<line class="grid" x1="12.0" y1="8" x2="12.0" y2="224"/>
+<text class="mut" x="12.0" y="244" text-anchor="middle">0</text>
+<line class="grid" x1="97.1" y1="8" x2="97.1" y2="224"/>
+<text class="mut" x="97.1" y="244" text-anchor="middle">20</text>
+<line class="grid" x1="182.3" y1="8" x2="182.3" y2="224"/>
+<text class="mut" x="182.3" y="244" text-anchor="middle">40</text>
+<line class="grid" x1="267.4" y1="8" x2="267.4" y2="224"/>
+<text class="mut" x="267.4" y="244" text-anchor="middle">60</text>
+<text class="mut" x="161" y="262" text-anchor="middle">M operations a second, mixed workload of 1M operations</text>
+<text class="txt" x="12" y="22"><tspan font-weight="700">v0</tspan> std::map levels</text>
+<rect class="v0" x="12" y="28" width="90.3" height="18"/>
+<rect class="o0" x="12" y="50.0" width="85.1" height="12"/>
+<text class="txt" x="108.3" y="42">21.2</text>
+<text class="mut" x="103.1" y="60" font-size="13">20.0</text>
+<text class="txt" x="12" y="94"><tspan font-weight="700">v1</tspan> arrays + bitset</text>
+<rect class="v1" x="12" y="100" width="146.0" height="18"/>
+<rect class="o1" x="12" y="122.0" width="129.4" height="12"/>
+<text class="txt" x="164.0" y="114">34.3</text>
+<text class="mut" x="147.4" y="132" font-size="13">30.4</text>
+<text class="txt" x="12" y="166"><tspan font-weight="700">v2</tspan> + id table</text>
+<rect class="v2" x="12" y="172" width="287.4" height="18"/>
+<rect class="o2" x="12" y="194.0" width="255.9" height="12"/>
+<text class="txt" x="305.4" y="186">67.5</text>
+<text class="mut" x="273.9" y="204" font-size="13">60.1</text>
 </svg>

@@ -109,14 +109,14 @@ REPO = DATA["source"]["repo"]
 
 def link(path, sha):
     kind = "tree" if path.endswith("/") else "blob"
-    return f'<a href="{REPO}/{kind}/{sha}/{path}"><code>{esc(path.rstrip("/"))}</code> at {sha}</a>'
+    return f'<a href="{REPO}/{kind}/{sha}/{path}"><code>{esc(path.rstrip("/")).replace("/", "/<wbr>")}</code> at {sha}</a>'
 
 
 def evidence(c):
     ev = []
     if "bench" in c:
         at = f' at <a href="{REPO}/tree/{c["at"]}">{c["at"]}</a>' if "at" in c else ""
-        ev.append(" and ".join(f"<code>{esc(b)}</code>" for b in c["bench"]) + at)
+        ev.append(" and ".join(f"<code>{esc(b).replace('/', '/<wbr>')}</code>" for b in c["bench"]) + at)
     elif "command" in c:
         ev.append(f"<code>{esc(c['command'])}</code>")
     if "sizing" in c:
@@ -171,6 +171,10 @@ BANNED = [
     ('class="draft"', "a placeholder is still on the page"),
     (" · ", "no middots"),
     ("#111", "ink is #171b20"),
+    ("lost a quarter of its speed", "two v1 runs disagree and neither is committed"),
+    ("within the first clock tick", "0-tick readings are not 'finished within' a tick"),
+    ("no faster with sequential ids", "the committed rerun is 1.1x"),
+    ("whole book after every step", "say what the test compares"),
 ]
 
 
@@ -197,6 +201,10 @@ def check():
     ai = re.search(r'<h2 id="ai">.*?</h2>\s*<p>(.*?)</p>', (ROOT / "colophon.html").read_text(encoding="utf-8"), re.S)
     if not ai or len(re.sub(r"<[^>]+>", "", ai[1]).split()) < 40:
         bad.append("colophon.html: the AI note is missing or under 40 words")
+    pdfb = (ROOT / "order-book-3x.pdf").read_bytes()
+    for host in (b"127.0.0.1", b"localhost", b"file://"):
+        if host in pdfb:
+            bad.append(f"order-book-3x.pdf: a link to {host.decode()}")
     for b in bad:
         print(b)
     return not bad
@@ -218,8 +226,17 @@ def og():
 
 
 def pdf():
-    chrome("--no-pdf-header-footer", "--force-prefers-reduced-motion",
-           f"--print-to-pdf={ROOT / 'order-book-3x.pdf'}", (ROOT / "order-book-3x.html").as_uri())
+    # Print a copy whose relative links point at the live site, so the PDF never carries
+    # file:// or a preview server's address. CSS, SVGs and #footnote links stay local.
+    src = (ROOT / "order-book-3x.html").read_text(encoding="utf-8")
+    src = re.sub(r'(<a\b[^>]*?\bhref=")(?!https?:|mailto:|#)(?:\./|/)?', r"\1" + SITE, src)
+    tmp = ROOT / "_print.html"
+    tmp.write_text(src, encoding="utf-8")
+    try:
+        chrome("--no-pdf-header-footer", "--force-prefers-reduced-motion",
+               f"--print-to-pdf={ROOT / 'order-book-3x.pdf'}", tmp.as_uri())
+    finally:
+        tmp.unlink()
 
 
 def main(argv):
