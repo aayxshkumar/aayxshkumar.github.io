@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="light">
+<style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden;background:#fff;color:#171b20;font-family:Charter,"Bitstream Charter","Sitka Text",Cambria,serif}
+.f{position:absolute;left:80px;right:80px;top:56px;bottom:56px}
+.chart{position:absolute;left:0;top:0;width:560px;height:518px}
+.bar{position:absolute;bottom:72px;width:140px}
+.v{position:absolute;left:0;right:0;text-align:center;font-size:34px;font-weight:700;font-variant-numeric:tabular-nums}
+.l{position:absolute;bottom:0;width:180px;margin-left:-20px;white-space:nowrap;text-align:center;font-size:26px;line-height:1.2}
+.l span{display:block;color:#565b62;font-size:22px}
+.base{position:absolute;left:0;width:520px;bottom:72px;border-top:2px solid #171b20}
+.t{position:absolute;left:620px;right:0;top:0;bottom:0}
+h1{font-size:54px;line-height:1.1;margin:0 0 26px;font-weight:700}
+.m{font-size:22px;line-height:1.4;color:#565b62;margin:0}
+.u{position:absolute;bottom:0;left:0;font-size:26px;color:#565b62;margin:0}
+</style></head><body><div class="f">
+<div class="chart">
+<div class="bar" style="left:0;height:126px;background:#af2b25"><div class="v" style="top:-46px">21.2M</div></div>
+<div class="bar" style="left:180px;height:204px;background:#565b62"><div class="v" style="top:-46px">34.3M</div></div>
+<div class="bar" style="left:360px;height:402px;background:#175fa4"><div class="v" style="top:-46px">67.5M</div></div>
+<div class="base"></div>
+<div class="l" style="left:0">v0<span>std::map</span></div>
+<div class="l" style="left:180px">v1<span>arrays + bitset</span></div>
+<div class="l" style="left:360px">v2<span>+ id table</span></div>
+</div>
+<div class="t">
+<h1>From 21M to 68M ops/s: two changes to a C++ order book</h1>
+<p class="m">Mixed workload of 1M operations, Apple M4, Apple clang 17, median of 3 runs. 5.2× on 20 minutes of real Binance BTCUSDT.</p>
+<p class="u">Aayush Kumar<br>aayxshkumar.github.io</p>
+</div>
+</div></body></html>

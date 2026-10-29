@@ -3,20 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Colophon · Aayush Kumar</title>
+<meta name="color-scheme" content="light dark">
+<title>Colophon – Aayush Kumar</title>
+<link rel="canonical" href="https://aayxshkumar.github.io/colophon.html">
+<link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Aayush Kumar">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
+<script type="speculationrules">
+{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/*.pdf","/*.png","/*.svg","/*.xml"]}}]},"eagerness":"moderate"}]}
+</script>
 </head>
 <body>
 <main>
 <p><a href="./">Aayush Kumar</a></p>
 <h1>Colophon</h1>
-<p>Set in Charter, with your system's monospace for numbers and code. No web fonts, no framework, no analytics, no cookies.</p>
-<p>The latency plot is an SVG generated from <code>lob_latency --csv</code> output by <code>tools/plot_cdf.py</code> in the <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a> repo. The raw quantiles are committed next to it.</p>
-<p>The step-through is about 230 lines of JavaScript that port lob-engine's matching rules. It does nothing until you click.</p>
-<p>The bar chart in the write-up is an SVG drawn by a short Python script from the numbers in the lob-engine README.</p>
-<p>The site is a handful of HTML files, one stylesheet and one script, hosted on GitHub Pages.</p>
+
+<h2 id="type"><a href="#type">Type</a></h2>
+<p>Set in Charter, which Matthew Carter drew in 1987, at 19 px on a measure of 62 characters; 17 px on phones. Nothing is downloaded. macOS and iOS ship Charter. Windows shows Sitka Text, also by Carter; Android shows Noto Serif. <code>font-size-adjust</code> matches each fallback’s x-height to Charter’s, so the line lengths hold. Code is in your system’s monospace, scaled to the same x-height as the text.</p>
+
+<h2 id="colour"><a href="#colour">Colour</a></h2>
+<p>Colour appears only in data. Blue is v2 and bids; red is v0 and asks, at matched lightness, so neither looks more important. There is no green: in some markets red means rising, and red against green is the commonest colour-blind confusion. The ink isn’t black. It is the bid blue at 22% lightness, <code>oklch(22% .012 255)</code>, and the greys share its hue. Links are a separate blue and stay underlined. Dark mode follows your system.</p>
+
+<h2 id="margin"><a href="#margin">The margin</a></h2>
+<p>From 1,152 px wide, every table and figure has its method beside it in the right margin: machine, compiler, statistic, commit, data file and script. On a narrower screen the same text is the caption. Each post ends with a dated list of revisions. Pages print to A4 with page numbers and link addresses, and the write-up is also a <a href="order-book-3x.pdf">PDF</a>.</p>
+
+<h2 id="numbers"><a href="#numbers">Numbers</a></h2>
+<p>Every number on the site is listed in <a href="receipts.json">receipts.json</a>, with what backs it, and the <a href="claims.html">claims ledger</a> is generated from that file by <code>build.py</code>. <code>build.py --check</code> fails if a page still carries a number this site has corrected.</p>
+
+<h2 id="built"><a href="#built">How it’s built</a></h2>
+<p>A handful of HTML files, one stylesheet and two small scripts, served by GitHub Pages. No framework, no web fonts, no analytics, no cookies, and no requests to anyone else’s server. The charts are SVGs written by short Python scripts from lob-engine’s committed data. The step-through on the home page ports lob-engine’s matching rules to JavaScript, and does nothing until you click; without JavaScript, the table above it says the same thing.</p>
+<p>Pages prefetch on hover and cross-fade in Chrome and Safari; other browsers load them normally. Nothing animates if your system asks for reduced motion.</p>
+<p><!-- weight -->The home page is 17.5 KB of HTML, CSS and JavaScript, compressed, plus 1.1 KB for its chart and icon. It loads no fonts.<!-- /weight --></p>
+
+<h2 id="ai"><a href="#ai">AI</a></h2>
+<p>Much of the code in lob-engine and on this site was written with Claude Code, Anthropic’s AI coding assistant, working from my direction. So far that is every commit in both repositories, and each one says so in a <code>Co-Authored-By: Claude</code> trailer. The numbers come from runs on my own machine, and the <a href="claims.html">claims ledger</a> shows which of them you can check yourself.</p>
+
+<h2 id="credits"><a href="#credits">Borrowed, with thanks</a></h2>
+<ul>
+<li>Charter for the screen, on <a href="https://practicaltypography.com/charter.html">Matthew Butterick’s</a> recommendation.</li>
+<li>Margin notes and method notes on numbers: <a href="https://www.edwardtufte.com/">Edward Tufte</a>’s sidenotes and <a href="https://gwern.net/design">Gwern Branwen</a>’s popups.</li>
+<li>Motion rules (fast in, slower out, nothing on load, nothing on what you use constantly): <a href="https://emilkowal.ski/ui/you-dont-need-animations">Emil Kowalski</a>.</li>
+<li>Link underline timing: <a href="https://paco.me/">Paco Coursey</a>.</li>
+<li>The landing tint, which appears once and fades: <a href="https://rauno.me/craft/interaction-design">Rauno Freiberg</a>’s “blink, then fade”.</li>
+<li>“Run it on your machine and send me the numbers”: <a href="https://github.com/nviennot/core-to-core-latency">nviennot/core-to-core-latency</a> and <a href="https://github.com/gunnarmorling/1brc">the One Billion Row Challenge</a>.</li>
+<li>Receipts in a fixed field order, like a message spec: <a href="https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification.pdf">Nasdaq TotalView-ITCH</a>.</li>
+<li>Measuring the clock before trusting it: <a href="https://vitaut.net/posts/2023/measuring-clock-precision/">Victor Zverovich</a>.</li>
+</ul>
 </main>
-<footer><p><a href="./">Home</a> · <a href="now.html">Now</a></p></footer>
+<footer>
+<ul class="links"><li><a href="./">Home</a></li><li><a href="now.html">Now</a></li><li><a href="claims.html">Claims</a></li><li><a href="atom.xml">Feed</a></li></ul>
+<p>Updated <time datetime="2026-10-29">29 October 2026</time>.</p>
+</footer>
 </body>
 </html>

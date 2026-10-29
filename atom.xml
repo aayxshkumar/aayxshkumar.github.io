@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Aayush Kumar</title>
+  <id>https://aayxshkumar.github.io/</id>
+  <link rel="self" href="https://aayxshkumar.github.io/atom.xml"/>
+  <link href="https://aayxshkumar.github.io/"/>
+  <updated>2026-10-29T00:00:00+05:30</updated>
+  <author><name>Aayush Kumar</name></author>
+  <entry>
+    <title>From 21M to 68M ops/s: two changes to a C++ order book</title>
+    <id>https://aayxshkumar.github.io/order-book-3x.html</id>
+    <link href="https://aayxshkumar.github.io/order-book-3x.html"/>
+    <published>2026-10-29T00:00:00+05:30</published>
+    <updated>2026-10-29T00:00:00+05:30</updated>
+    <summary>Flat price-level arrays and an open-addressing id table took a C++20 order book from 21.2M to 67.5M ops/s; one step was slower first.</summary>
+  </entry>
+  <entry>
+    <title>Replaying 20 minutes of Binance BTCUSDT</title>
+    <id>https://aayxshkumar.github.io/#real-data</id>
+    <link href="https://aayxshkumar.github.io/#real-data"/>
+    <published>2026-10-29T00:00:00+05:30</published>
+    <updated>2026-10-29T00:00:00+05:30</updated>
+    <summary>562,850 order operations: v2 at 81.9M ops/s against 15.9M for std::map.</summary>
+  </entry>
+  <entry>
+    <title>v2: an open-addressing id table, and the 32 MB table that hid its gain</title>
+    <id>https://aayxshkumar.github.io/#id-table</id>
+    <link href="https://aayxshkumar.github.io/#id-table"/>
+    <published>2026-10-29T00:00:00+05:30</published>
+    <updated>2026-10-29T00:00:00+05:30</updated>
+    <summary>Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is about twice as fast as v1.</summary>
+  </entry>
+  <entry>
+    <title>A benchmark found a full-band scan in my “faster” version</title>
+    <id>https://aayxshkumar.github.io/#full-band-scan</id>
+    <link href="https://aayxshkumar.github.io/#full-band-scan"/>
+    <published>2026-10-28T00:00:00+05:30</published>
+    <updated>2026-10-28T00:00:00+05:30</updated>
+    <summary>Clearing the last ask scanned all 65,536 ticks: 22.5 µs a sweep against 2.0 µs for std::map.</summary>
+  </entry>
+  <entry>
+    <title>Apple Silicon’s steady_clock ticks every 41.7 ns</title>
+    <id>https://aayxshkumar.github.io/#steady-clock</id>
+    <link href="https://aayxshkumar.github.io/#steady-clock"/>
+    <published>2026-10-28T00:00:00+05:30</published>
+    <updated>2026-10-28T00:00:00+05:30</updated>
+    <summary>My p50 came out at exactly one tick of a 24 MHz clock.</summary>
+  </entry>
+  <entry>
+    <title>My first differential test passed with a planted bug in it</title>
+    <id>https://aayxshkumar.github.io/#first-differential-test</id>
+    <link href="https://aayxshkumar.github.io/#first-differential-test"/>
+    <published>2026-10-28T00:00:00+05:30</published>
+    <updated>2026-10-28T00:00:00+05:30</updated>
+    <summary>Queues never formed, so priority bugs had nothing to break.</summary>
+  </entry>
+</feed>

@@ -4,6 +4,9 @@
 // orders: one is the reference, the other can have one of the bugs I planted
 // in the C++ to check that my tests catch them. The page stops at the first
 // step where the two books disagree. Nothing moves until you click.
+//
+// The state is linkable: #bug=2&step=7 opens that bug at that step. It is
+// written with history.replaceState, so stepping adds no history entries.
 
 (() => {
   "use strict";
@@ -32,7 +35,7 @@
     early: "Limit order crosses one tick early",
     stale: "Cancel leaves a stale level total",
     grow: "Growing an order keeps its queue place",
-    taker: "Trades print at the taker's price",
+    taker: "Trades print at the taker’s price",
     market: "Market orders obey a zero limit",
   };
 
@@ -130,21 +133,37 @@
     return `Modify #${op.id} to ${op.qty} @ ${px(op.px)}`;
   };
   const levelKey = (lvl) => `${lvl.total}|${lvl.q.map((o) => o.id + ":" + o.qty).join(",")}`;
+  // Fills summed by price, in the order they printed: "4 @ 101.50".
+  const fills = (book) => {
+    const by = new Map();
+    for (const t of book.trades) by.set(t.px, (by.get(t.px) || 0) + t.qty);
+    return [...by].map(([p, q]) => `${q} @ ${px(p)}`).join(" and ");
+  };
+  const sideName = (s) => (s === "S" ? "ask" : "bid");
 
   function diff(a, b) {
-    const ta = a.trades.map((t) => `#${t.maker}→#${t.taker} ${t.qty}@${px(t.px)}`).join(", ") || "no trades";
-    const tb = b.trades.map((t) => `#${t.maker}→#${t.taker} ${t.qty}@${px(t.px)}`).join(", ") || "no trades";
-    if (ta !== tb) return { what: "trades", text: `lob-engine printed ${ta}; the reference printed ${tb}.` };
+    const ta = fills(a), tb = fills(b);
+    if (ta !== tb) {
+      const mine = ta ? `lob-engine traded ${ta}` : "lob-engine didn’t trade";
+      const ref = tb ? `the reference traded ${tb}` : "the reference didn’t";
+      return { what: "trades", text: `${mine}; ${ref}.` };
+    }
     for (const s of ["S", "B"]) {
       const prices = new Set([...a[s].keys(), ...b[s].keys()]);
       for (const p of [...prices].sort((x, y) => y - x)) {
         const la = a[s].get(p), lb = b[s].get(p);
         const ka = la ? levelKey(la) : "", kb = lb ? levelKey(lb) : "";
-        if (ka !== kb) {
-          const desc = (l) => (l ? `total ${l.total}, queue ${l.q.map((o) => "#" + o.id).join(" ") || "empty"}` : "no level");
-          const cell = la && lb && la.total !== lb.total ? "total" : "queue";
-          return { what: "level", side: s, px: p, cell, text: `At ${px(p)}: lob-engine has ${desc(la)}; the reference has ${desc(lb)}.` };
+        if (ka === kb) continue;
+        const at = `${sideName(s)} ${px(p)}`;
+        if (!la || !lb) {
+          const has = la ? "lob-engine" : "the reference", hasnt = la ? "the reference" : "lob-engine";
+          const l = la || lb;
+          return { what: "level", side: s, px: p, cell: "total", text: `${has} has a ${at} level, total ${l.total}; ${hasnt} has none.` };
         }
+        if (la.total !== lb.total)
+          return { what: "level", side: s, px: p, cell: "total", text: `at ${at}, lob-engine’s total is ${la.total}; the reference’s is ${lb.total}.` };
+        const q = (l) => l.q.map((o) => "#" + o.id).join(" ");
+        return { what: "level", side: s, px: p, cell: "queue", text: `at ${at}, lob-engine’s queue is ${q(la)}; the reference’s is ${q(lb)}.` };
       }
     }
     return null;
@@ -153,11 +172,13 @@
   // ---- UI -------------------------------------------------------------------
   const $ = (sel) => root.querySelector(sel);
   const bugSel = $("#bug"), list = $("#ops"), out = $("#verdict");
-  const books = { mine: $("#book-mine"), ref: $("#book-ref") };
+  const table = $("#book");
+  const keys = Object.keys(BUGS);
+  const N = OPS.length;
   let step = 0;
 
   for (const [k, v] of Object.entries(BUGS)) bugSel.add(new Option(v, k));
-  list.innerHTML = OPS.map((op, i) => `<li id="op-${i}">${opText(op)}</li>`).join("");
+  list.innerHTML = OPS.map((op, i) => `<li id="op-${i}"><span class="n">${i + 1}</span><span>${opText(op)}</span></li>`).join("");
 
   function stateAt(n, bug) {
     const mine = newBook(), ref = newBook();
@@ -174,73 +195,115 @@
   }
 
   function firstDivergence(bug) {
-    for (let n = 1; n <= OPS.length; n++) {
-      const s = stateAt(n, bug);
-      if (s.first) return n;
-    }
+    for (let n = 1; n <= N; n++) if (stateAt(n, bug).first) return n;
     return null;
   }
 
-  function renderBook(el, book, d) {
-    const rows = [];
-    const asks = [...book.S.keys()].sort((a, b) => b - a);
-    const bids = [...book.B.keys()].sort((a, b) => b - a);
+  // One table: lob-engine on the left, the reference on the right, and a
+  // match column between them. Rows are the union of both books' levels.
+  const EQ = '<span aria-hidden="true">=</span><span class="vh">matches</span>';
+  const NE = '<span aria-hidden="true">≠</span><span class="vh">differs</span>';
+  const queue = (l) => (l ? l.q.map((o) => `<span>#${o.id} (${o.qty})</span>`).join(" ") : "–");
+  const spread = (b) => {
+    const a = bestAskPx(b.S), d = bestPx(b.B);
+    return a === null || d === null ? "one-sided" : ((a - d) / 100).toFixed(2);
+  };
+
+  function renderTable(mine, ref, d) {
+    let first = true;
     const row = (s, p) => {
-      const l = book[s].get(p);
+      const la = mine[s].get(p), lb = ref[s].get(p);
+      const same = (la ? levelKey(la) : "") === (lb ? levelKey(lb) : "");
       const hit = d && d.what === "level" && d.side === s && d.px === p;
-      const bad = hit ? " class=\"bad\"" : "";
-      const dt = hit && d.cell === "total" ? " class=\"diff\"" : "";
-      const dq = hit && d.cell === "queue" ? " diff" : "";
-      return `<tr${bad}><td class="${s === "S" ? "ask" : "bid"}">${s === "S" ? "ask" : "bid"}</td><td>${px(p)}</td><td${dt}>${l.total}</td><td class="q${dq}">${l.q.map((o) => `#${o.id}·${o.qty}`).join(" ")}</td></tr>`;
+      const bad = !same && first && hit;
+      if (bad) first = false;
+      const dt = bad && d.cell === "total" ? ' class="diff"' : "";
+      const dq = bad && d.cell === "queue" ? " diff" : "";
+      return `<tr${bad ? ' class="bad"' : ""}><td class="${sideName(s)}">${sideName(s)}</td><td>${px(p)}</td>` +
+        `<td${dt}>${la ? la.total : "–"}</td><td class="q${dq}">${queue(la)}</td>` +
+        `<td class="eq${same ? "" : " ne"}">${same ? EQ : NE}</td>` +
+        `<td${dt}>${lb ? lb.total : "–"}</td><td class="q${dq}">${queue(lb)}</td></tr>`;
     };
-    for (const p of asks) rows.push(row("S", p));
-    if (asks.length && bids.length) rows.push('<tr class="gap"><td colspan="4"></td></tr>');
-    for (const p of bids) rows.push(row("B", p));
-    const trades = book.trades.length
-      ? book.trades.map((t) => `#${t.maker} filled ${t.qty} @ ${px(t.px)}`).join("; ")
-      : "none";
-    el.querySelector("tbody").innerHTML = rows.join("") || '<tr><td colspan="4" class="mut">empty book</td></tr>';
-    const tr = el.querySelector(".trades");
-    tr.textContent = `Trades this step: ${trades}`;
-    tr.classList.toggle("bad", !!(d && d.what === "trades"));
+    const prices = (s) => [...new Set([...mine[s].keys(), ...ref[s].keys()])].sort((a, b) => b - a);
+    const asks = prices("S"), bids = prices("B");
+    const rows = asks.map((p) => row("S", p));
+    if (asks.length || bids.length) {
+      const sa = spread(mine), sb = spread(ref);
+      rows.push(`<tr class="spread"><td>spread</td><td></td><td>${sa}</td><td></td>` +
+        `<td class="eq${sa === sb ? "" : " ne"}">${sa === sb ? EQ : NE}</td><td>${sb}</td><td></td></tr>`);
+    }
+    rows.push(...bids.map((p) => row("B", p)));
+    table.tBodies[0].innerHTML = rows.join("") || '<tr><td colspan="7" class="mut">Both books are empty.</td></tr>';
+    const fa = fills(mine) || "none", fb = fills(ref) || "none";
+    const tbad = !!(d && d.what === "trades");
+    table.tFoot.innerHTML = `<tr${tbad ? ' class="bad"' : ""}><td>trades</td><td colspan="3">${fa}</td>` +
+      `<td class="eq${fa === fb ? "" : " ne"}">${fa === fb ? EQ : NE}</td><td colspan="2">${fb}</td></tr>`;
   }
 
-  function render() {
+    function render(write) {
     const bug = bugSel.value;
     const s = stateAt(step, bug);
-    renderBook(books.mine, s.mine, s.last);
-    renderBook(books.ref, s.ref, s.last);
+    renderTable(s.mine, s.ref, s.last);
     list.querySelectorAll("li").forEach((li, i) => {
       li.classList.toggle("done", i < step);
       if (i === step - 1) li.setAttribute("aria-current", "step");
       else li.removeAttribute("aria-current");
     });
-    $("#count").textContent = `Step ${step} of ${OPS.length}`;
     $("#prev").setAttribute("aria-disabled", String(step === 0));
-    $("#next").setAttribute("aria-disabled", String(step === OPS.length));
-    const where = step ? `Step ${step} of ${OPS.length}, ${opText(OPS[step - 1])}. ` : "";
-    if (s.first && s.first.step <= step) {
-      out.className = "verdict bad";
-      out.textContent = `Step ${s.first.step}, ${opText(OPS[s.first.step - 1])}: the books differ. ${s.first.text}`;
-    } else if (step === OPS.length) {
-      out.className = "verdict ok";
-      out.textContent = where + (bug === "none" ? "All steps match the reference." : "No difference found. This bug survived the scenario.");
+    $("#reset").setAttribute("aria-disabled", String(step === 0));
+    $("#next").setAttribute("aria-disabled", String(step === N));
+    const where = step ? `Step ${step} of ${N}. ${opText(OPS[step - 1])}.` : "";
+    let text, bad = false;
+    if (s.first && s.first.step === step) {
+      text = `${where} The books differ: ${s.first.text}`; bad = true;
+    } else if (s.first && s.first.step < step) {
+      text = `${where} The books first differed at step ${s.first.step}: ${s.first.text}`; bad = true;
+    } else if (step === N) {
+      text = `${where} ` + (bug === "none" ? `All ${N} steps match the reference.` : `No difference in ${N} steps: this bug survives the scenario.`);
+    } else if (step === 0) {
+      const what = bug === "none" ? "No bug planted." : `Planted: ${BUGS[bug].charAt(0).toLowerCase() + BUGS[bug].slice(1)}.`;
+      text = `${what} Step 0 of ${N}. Press Next or →, or Run to first difference.`;
     } else {
-      out.className = "verdict";
-      out.textContent = step === 0 ? "Press Next (or the → key), or Run to first difference." : where + "The books match so far.";
+      text = `${where} The books match so far.`;
+    }
+    out.className = bad ? "verdict bad" : "verdict";
+    out.textContent = text;
+    if (write) {
+      try { history.replaceState(history.state, "", `#bug=${keys.indexOf(bug)}&step=${step}`); } catch (e) { /* file:// in some browsers */ }
     }
   }
 
-  const go = (n) => { step = Math.max(0, Math.min(OPS.length, n)); render(); };
+  const go = (n) => { step = Math.max(0, Math.min(N, n)); render(true); };
   $("#prev").addEventListener("click", () => go(step - 1));
   $("#next").addEventListener("click", () => go(step + 1));
+  $("#reset").addEventListener("click", () => go(0));
+  $("#run").addEventListener("click", () => go(firstDivergence(bugSel.value) ?? N));
+  bugSel.addEventListener("change", () => go(0));
   root.addEventListener("keydown", (e) => {
-    if (e.target === bugSel || e.altKey || e.ctrlKey || e.metaKey) return;
-    if (e.key === "ArrowRight") { go(step + 1); e.preventDefault(); }
-    if (e.key === "ArrowLeft") { go(step - 1); e.preventDefault(); }
+    if (e.target === bugSel || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const to = { ArrowRight: step + 1, ArrowLeft: step - 1, Home: 0, End: N }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    go(to);
   });
-  $("#run").addEventListener("click", () => { step = firstDivergence(bugSel.value) ?? OPS.length; render(); });
-  $("#reset").addEventListener("click", () => { step = 0; render(); });
-  bugSel.addEventListener("change", () => { step = 0; render(); });
-  render();
+
+  // Read a linked state (#bug=2&step=7) on load, and when such a link is followed on this page.
+  function fromHash() {
+    const m = /^#bug=(\d+)&step=(\d+)$/.exec(location.hash);
+    if (m && keys[+m[1]]) { bugSel.value = keys[+m[1]]; step = Math.min(N, +m[2]); }
+    return !!m;
+  }
+  // Each "caught at step" cell in the static table links to that bug at that step.
+  // Added here, not in the HTML: without JavaScript the stepper is hidden and the link would be dead.
+  document.querySelectorAll("#bugs tbody tr").forEach((tr) => {
+    const k = keys.findIndex((key) => BUGS[key] === tr.cells[0].textContent.trim());
+    const cell = tr.cells[1], m = /^(\d+)/.exec(cell.textContent);
+    if (k > 0 && m) cell.innerHTML = `<a href="#bug=${k}&step=${m[1]}">${cell.textContent}</a>`;
+  });
+
+  const linked = fromHash();
+  render(false);
+  if (linked || location.hash === "#stepper") root.scrollIntoView({ block: "start" });
+  addEventListener("pageshow", (e) => { if (e.persisted && fromHash()) render(false); });
+  addEventListener("hashchange", () => { if (fromHash()) { render(false); root.scrollIntoView({ block: "start" }); } });
 })();
