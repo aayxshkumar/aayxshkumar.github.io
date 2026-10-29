@@ -19,13 +19,15 @@
 <meta property="article:published_time" content="2026-10-29">
 <meta property="article:modified_time" content="2026-10-29">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon-96.png" sizes="96x96" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="style.css">
 <script type="speculationrules">
 {"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/*.pdf","/*.png","/*.svg","/*.xml"]}}]},"eagerness":"moderate"}]}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","headline":"From 21M to 68M ops/s: two changes to a C++ order book","datePublished":"2026-10-29","dateModified":"2026-10-29","author":{"@type":"Person","name":"Aayush Kumar","url":"https://aayxshkumar.github.io/"}}
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"From 21M to 68M ops/s: two changes to a C++ order book","datePublished":"2026-10-29","dateModified":"2026-10-30","url":"https://aayxshkumar.github.io/order-book-3x.html","mainEntityOfPage":"https://aayxshkumar.github.io/order-book-3x.html","image":"https://aayxshkumar.github.io/og-order-book-3x.png","author":{"@type":"Person","@id":"https://aayxshkumar.github.io/#me","name":"Aayush Kumar","url":"https://aayxshkumar.github.io/"}}
 </script>
 </head>
 <body>
@@ -64,7 +66,7 @@
 
 <p>Before optimising anything I wanted a way to tell whether a faster version was still correct. The test suite includes a deliberately naive reference book (plain vectors, linear scans), and a differential test pushes 20,000 random operations through both, comparing every trade, the best bid and ask, the order count and the depth at every price after every step, over 10 seeds.</p>
 
-<p>My first version of that test passed with a bug planted in it. The random orders crossed the spread so often that queues never formed, so time-priority bugs had nothing to break. Biasing the flow towards passive orders and adding explicit “increase size at the same price” modifies fixed it. Since then I plant bugs by hand to check the tests catch them; it’s 16 so far, and the tests catch all of them. You can step through five of them on the <a href="./#bugs">home page</a>.</p>
+<p>My first version of that test passed with a bug planted in it. The random orders crossed the spread so often that queues never formed, so time-priority bugs had nothing to break. Biasing the flow towards passive orders and adding explicit “increase size at the same price” modifies fixed it. Since then, bugs have been planted on purpose to check that the tests catch them; it’s 16 so far, and the tests catch all of them. You can step through five of them on the <a href="./#bugs">home page</a>.</p>
 
 <h2 id="v1"><a href="#v1">v1: flat arrays, which made it slower first</a></h2>
 
@@ -128,7 +130,7 @@
     return true;
 }</code></pre>
 
-<p>Backward shift is easy to get subtly wrong when a run wraps past the end of the array, so the table has its own differential test against <code>std::unordered_map</code>: 20 seeds of 20,000 inserts and erases in a 16-slot table, where nearly every run is long and many wrap. I planted four bugs in the deletion code and it caught all four. A fifth survived, and it took me a minute to see why: it swapped two checks in a way that can’t change the result, so it’s an equivalent mutant.</p>
+<p>Backward shift is easy to get subtly wrong when a run wraps past the end of the array, so the table has its own differential test against <code>std::unordered_map</code>: 20 seeds of 20,000 inserts and erases in a 16-slot table, where nearly every run is long and many wrap. It caught all four bugs planted in the deletion code. A fifth survived, for a reason that isn’t obvious at first: it swapped two checks in a way that can’t change the result, so it’s an equivalent mutant.</p>
 
 <p>The first v2 result was confusing. With sequential ids it was barely faster than v1: 34.4M against 34.4M ops/s in the first run, 37.7M in the committed rerun. The benchmark sized the book for one million orders, so the id table had 2<sup>21</sup> slots, 32 MB, twice the 16 MB L2 that the M4’s performance cores share, and I expect most lookups missed; I haven’t counted the misses yet (that’s the <code>perf stat</code> run below). The workload never has more than about 109,000 live orders. Sized for 262,144, the table has 2<sup>19</sup> slots, 8 MB, which fits in that L2, and v2 runs at about twice v1’s figure with either kind of id (v1 was only ever measured with the book sized for 1M).</p>
 
@@ -233,6 +235,12 @@ python3 tools/record_binance.py BTCUSDT 1200 data/btcusdt.lobrec
 <li><time datetime="2026-10-29">2026-10-29</time>. Removed a sentence that put v2’s gain with random ids, while the table was oversized, at 40%. No committed run gives that figure; the paragraph now uses the README’s numbers.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. Corrected the sizing note. v1’s 34.3M was measured at <a href="https://github.com/aayxshkumar/lob-engine/commit/ffe9956">ffe9956</a>, whose benchmark sizes the book for all 1M operations; v0 and v2 are sized for 262,144.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. The commit message of <a href="https://github.com/aayxshkumar/lob-engine/commit/0a8bdc2">0a8bdc2</a> says 20.1M → 34.0M ops/s. Those were the README’s v0 and v1 medians until <a href="https://github.com/aayxshkumar/lob-engine/commit/9d18ba6">9d18ba6</a>, which gives 21.2M and 34.3M. The numbers here are the later ones.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. The latency chart’s caption said v2 finishes 55.5% of adds inside one clock tick, and the axis had a 0 ns label. A reading of 0 ticks means no tick fell inside the call, so the caption now says those calls read 0 ticks and the label is gone.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. The differential test now compares depth at every price after every step, over 10 seeds (<a href="https://github.com/aayxshkumar/lob-engine/commit/41bf158">41bf158</a>). Before that it compared depth once, after 20,000 steps, on one seed.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. The paragraph on the id table sized for 1M said v1 and v2 tied at 34.4M. That was the first run; the committed rerun gives v2 37.7M. It now names the cache, the 16 MB L2 the performance cores share, and says the misses haven’t been counted.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. Replaced a remark that real venues send ids that look random with how ITCH assigns them: order numbers are shared across all instruments, so one book sees a sparse, interleaved subset.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. Marked v1’s random-id figure as never committed; another run gave a different result.</li>
+<li><time datetime="2026-10-30">2026-10-30</time>. Reworded the planted-bug sentences so they don’t say who planted each bug; the work is co-authored with Claude Code (<a href="colophon.html#ai">colophon</a>).</li>
 </ol>
 
 </main>

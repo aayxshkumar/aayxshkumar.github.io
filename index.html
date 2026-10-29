@@ -4,11 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Aayush Kumar</title>
-<meta name="description" content="Software developer at Airbus (C++/Qt). Building lob-engine, a C++20 order book: 21.2M to 67.5M ops/s in two measured steps, checked by a differential test and replayed on real Binance data.">
+<title>Aayush Kumar – C++ software developer at Airbus</title>
+<meta name="description" content="Aayush Kumar (aayxshkumar), software developer at Airbus writing C++ and Qt/QML. NIT Kurukshetra 2025, Certified Kubernetes Administrator. Building lob-engine, a C++20 limit order book tested against a naive reference book.">
+<meta name="author" content="Aayush Kumar">
 <link rel="canonical" href="https://aayxshkumar.github.io/">
 <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Aayush Kumar">
-<meta property="og:type" content="website">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Aayush Kumar">
+<meta property="profile:first_name" content="Aayush">
+<meta property="profile:last_name" content="Kumar">
+<meta property="profile:username" content="aayxshkumar">
 <meta property="og:url" content="https://aayxshkumar.github.io/">
 <meta property="og:title" content="Aayush Kumar">
 <meta property="og:description" content="C++ developer at Airbus, building lob-engine: a C++20 order book that went from 21.2M to 67.5M ops/s in two measured steps.">
@@ -17,14 +22,22 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="From 21M to 68M ops/s: two changes to a C++ order book. Bars for std::map 21.2M, arrays + bitset 34.3M and id table 67.5M ops/s on an Apple M4; 5.2 times faster than v0 on 20 minutes of Binance BTCUSDT.">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon-96.png" sizes="96x96" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="me" href="https://github.com/aayxshkumar">
+<link rel="me" href="https://www.linkedin.com/in/aayush-kumr">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="stylesheet" href="style.css">
 <script type="speculationrules">
 {"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/*.pdf","/*.png","/*.svg","/*.xml"]}}]},"eagerness":"moderate"}]}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Person","name":"Aayush Kumar","jobTitle":"Software Developer","worksFor":{"@type":"Organization","name":"Airbus"},"url":"https://aayxshkumar.github.io/","sameAs":["https://github.com/aayxshkumar","https://linkedin.com/in/aayush-kumr"]}
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebSite","@id":"https://aayxshkumar.github.io/#website","url":"https://aayxshkumar.github.io/","name":"Aayush Kumar","alternateName":"aayxshkumar"},
+{"@type":"ProfilePage","@id":"https://aayxshkumar.github.io/#profile","url":"https://aayxshkumar.github.io/","isPartOf":{"@id":"https://aayxshkumar.github.io/#website"},"dateModified":"2026-10-30","mainEntity":{"@id":"https://aayxshkumar.github.io/#me"}},
+{"@type":"Person","@id":"https://aayxshkumar.github.io/#me","name":"Aayush Kumar","alternateName":"aayxshkumar","url":"https://aayxshkumar.github.io/","email":"mailto:aayushkumr25@gmail.com","description":"Software developer at Airbus writing C++ and Qt/QML; building lob-engine, a C++20 limit order book.","jobTitle":"Software Developer","worksFor":{"@type":"Organization","name":"Airbus","url":"https://www.airbus.com/"},"alumniOf":{"@type":"CollegeOrUniversity","name":"National Institute of Technology Kurukshetra","url":"https://nitkkr.ac.in/"},"hasCredential":{"@type":"EducationalOccupationalCredential","name":"Certified Kubernetes Administrator (CKA)","credentialCategory":"certification","recognizedBy":{"@type":"Organization","name":"The Linux Foundation"}},"knowsAbout":["C++","C++20","Qt","QML","Low-latency systems","Limit order books","Linux","Kubernetes"],"sameAs":["https://github.com/aayxshkumar","https://www.linkedin.com/in/aayush-kumr"]}
+]}
 </script>
 </head>
 <body>
@@ -34,14 +47,14 @@
 
 <p>I’m a software developer at Airbus, where I write C++ and Qt/QML for an iPad app that 40,000 pilots use every day for flight-operations work. Profiling it with Instruments, I cut main-thread memory by 23%.</p>
 
-<p>Outside work I’m building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book in C++20. Two measured changes took it from 21.2M to 67.5M operations a second; it replays 20 minutes of real Binance BTCUSDT data 5.2× faster than its <code>std::map</code> baseline; and its tests have caught all 16 bugs I planted. <a href="order-book-3x.html">The write-up</a> has the numbers at each step.</p>
+<p>Outside work I’m building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book in C++20. Two measured changes took it from 21.2M to 67.5M operations a second; it replays 20 minutes of real Binance BTCUSDT data 5.2× faster than its <code>std::map</code> baseline; and its tests have caught all 16 bugs planted to test them. <a href="order-book-3x.html">The write-up</a> has the numbers at each step.</p>
 
 <p>I’m looking for quant developer, low-latency C++, infrastructure and backend roles.</p>
 
 <ul class="links">
 <li><a href="mailto:aayushkumr25@gmail.com">aayushkumr25@gmail.com</a></li>
-<li><a href="https://github.com/aayxshkumar">GitHub</a></li>
-<li><a href="https://linkedin.com/in/aayush-kumr">LinkedIn</a></li>
+<li><a rel="me" href="https://github.com/aayxshkumar">GitHub (aayxshkumar)</a></li>
+<li><a rel="me" href="https://www.linkedin.com/in/aayush-kumr">LinkedIn</a></li>
 <li><a href="Aayush_Kumar_Resume.pdf">Résumé, PDF</a></li>
 </ul>
 
@@ -74,7 +87,7 @@
 
 <h3 id="testing">Testing</h3>
 
-<p>Every operation is checked against a deliberately naive reference book, trades and depth at every price, over 20,000 random steps for each of 10 seeds, and the old and new books run the same 22 tests. My first version of that test passed with a bug planted in it: the random flow crossed the spread so often that queues never formed, so priority bugs had nowhere to show up. Once I biased the flow towards passive orders and added same-price size increases, the tests caught every bug I planted by hand, <button type="button" class="num" popovertarget="m-bugs" style="anchor-name: --m-bugs">16 of 16<span class="vh">, how this was measured</span></button><span id="m-bugs" popover class="method" style="position-anchor: --m-bugs">Planted by hand in the C++: 5 in the matching rules, 4 in the array book, 3 in the bitset, 4 in the id table. The 51 tests and the 20,000-step differential test caught each one. <a href="#n-bugs">Full receipt</a>.<button type="button" class="close" popovertarget="m-bugs" popovertargetaction="hide">Close</button></span> &#8288;so &#8288;far.</p>
+<p>Every operation is checked against a deliberately naive reference book, trades and depth at every price, over 20,000 random steps for each of 10 seeds, and the old and new books run the same 22 tests. My first version of that test passed with a bug planted in it: the random flow crossed the spread so often that queues never formed, so priority bugs had nowhere to show up. Once I biased the flow towards passive orders and added same-price size increases, the tests caught every bug planted to test them, <button type="button" class="num" popovertarget="m-bugs" style="anchor-name: --m-bugs">16 of 16<span class="vh">, how this was measured</span></button><span id="m-bugs" popover class="method" style="position-anchor: --m-bugs">Planted in the C++: 5 in the matching rules, 4 in the array book, 3 in the bitset, 4 in the id table. The 51 tests and the 20,000-step differential test caught each one. <a href="#n-bugs">Full receipt</a>.<button type="button" class="close" popovertarget="m-bugs" popovertargetaction="hide">Close</button></span> &#8288;so &#8288;far.</p>
 
 <p>Five of them are in the table below; with JavaScript on, you can step through each one. It’s a JavaScript port of the matching rules replaying a short hand-written scenario; the C++ and the 20,000-step test are <a href="https://github.com/aayxshkumar/lob-engine/tree/main/tests">on GitHub</a>.</p>
 
@@ -126,7 +139,7 @@
 <li id="n-replay"><b>5.2× on real data: 81.9M against 15.9M ops/s.</b><dl class="rcpt"><dt>Benchmark</dt><dd><code>lob_replay</code> over one recording of Binance’s public BTCUSDT streams, 29 October 2026, 02:30–02:50 UTC: 11,992 depth updates and 71,328 trades, translated into 562,850 order operations, at most 4,203 resting; level updates outside a $79,575–$80,231 price band (44,015 of 544,092) skipped; v0 and v2 end with the same 63,498 fills and 3,985 resting orders</dd><dt>Machine</dt><dd>Apple M4, macOS 26</dd><dt>Compiler</dt><dd>Apple clang 17, <code>-O3</code></dd><dt>Statistic</dt><dd>median of 5 runs</dd><dt>Published</dt><dd><a href="https://github.com/aayxshkumar/lob-engine/blob/2178cef/README.md">README at 2178cef</a>, code at <a href="https://github.com/aayxshkumar/lob-engine/tree/9014c87">9014c87</a></dd><dt>Raw output</dt><dd>a rerun gives 14.5M → 80.1M (5.5×), <a href="https://github.com/aayxshkumar/lob-engine/blob/129ef11/bench/results/2026-10-29-m4-9d27e87/replay.txt">replay.txt at 129ef11</a>; the recording isn’t published</dd></dl><p class="more">Command and status: <a href="claims.html#c-replay">claims ledger</a>.</p></li>
 <li id="n-match"><b>99.93% top-10 match.</b><dl class="rcpt"><dt>Check</dt><dd>after each depth update, the top 10 levels on each side against the exchange’s; the rest come from trades that arrive after an update that already includes them, and without trades it matches after every update</dd><dt>Published</dt><dd><a href="https://github.com/aayxshkumar/lob-engine/blob/2178cef/README.md">README at 2178cef</a>; CI runs the same check, strict, on a synthetic recording</dd><dt>Raw output</dt><dd>the same 99.93% in <a href="https://github.com/aayxshkumar/lob-engine/blob/129ef11/bench/results/2026-10-29-m4-9d27e87/replay.txt">replay.txt at 129ef11</a></dd></dl><p class="more">Command and status: <a href="claims.html#c-match">claims ledger</a>.</p></li>
 <li id="n-ticks"><b>55.5% and 16.4% of adds read 0 ticks.</b><dl class="rcpt"><dt>Data</dt><dd><a href="https://github.com/aayxshkumar/lob-engine/blob/9d18ba6/docs/m4-quantiles.csv">docs/m4-quantiles.csv</a> at 9d18ba6, 550,713 <code>add_limit</code> calls per book (the adds among 1M mixed operations), from <code>lob_latency</code></dd><dt>Machine</dt><dd>Apple M4, macOS 26</dd><dt>Compiler</dt><dd>Apple clang 17, <code>-O3</code></dd><dt>Clock</dt><dd>24 MHz <code>steady_clock</code> (<code>sysctl hw.tbfrequency</code> prints 24000000), so one tick is 41.7 ns and these are tick counts, not nanoseconds</dd><dt>Tail</dt><dd>p99 is 2 ticks for both; p99.9 is 14 ticks for v0 and 3 for v2</dd><dt>Raw output</dt><dd>public at 9d18ba6</dd></dl><p class="more">Command and status: <a href="claims.html#c-ticks">claims ledger</a>.</p></li>
-<li id="n-bugs"><b>16 of 16 planted bugs caught.</b><dl class="rcpt"><dt>Where</dt><dd>5 in the matching rules, 4 in the array book, 3 in the bitset, 4 in the id table, planted by hand in the C++</dd><dt>Tests</dt><dd>51 tests and the 20,000-step differential test, <a href="https://github.com/aayxshkumar/lob-engine/tree/2178cef/tests">tests/ at 2178cef</a>; a fifth id-table mutant survived because it is equivalent</dd><dt>Published</dt><dd><a href="https://github.com/aayxshkumar/lob-engine/blob/2178cef/README.md">README at 2178cef</a></dd><dt>Mutant patches</dt><dd><span class="missing">not committed yet</span></dd></dl><p class="more">Command and status: <a href="claims.html#c-bugs">claims ledger</a>.</p></li>
+<li id="n-bugs"><b>16 of 16 planted bugs caught.</b><dl class="rcpt"><dt>Where</dt><dd>5 in the matching rules, 4 in the array book, 3 in the bitset, 4 in the id table, planted in the C++</dd><dt>Tests</dt><dd>51 tests and the 20,000-step differential test, <a href="https://github.com/aayxshkumar/lob-engine/tree/2178cef/tests">tests/ at 2178cef</a>; a fifth id-table mutant survived because it is equivalent</dd><dt>Published</dt><dd><a href="https://github.com/aayxshkumar/lob-engine/blob/2178cef/README.md">README at 2178cef</a></dd><dt>Mutant patches</dt><dd><span class="missing">not committed yet</span></dd></dl><p class="more">Command and status: <a href="claims.html#c-bugs">claims ledger</a>.</p></li>
 </ol>
 
 <h2 id="log"><a href="#log">Log</a></h2>
@@ -157,17 +170,17 @@
 <ul>
 <li><a href="https://github.com/aayxshkumar/gemini-code"><strong>gemini-code</strong></a>: my fork of <a href="https://github.com/Muruganandham18/gemini-code">Muruganandham18/gemini-code</a>, a TypeScript CLI that drives Gemini through browser automation. My releases (v0.8 to v0.13) added Windows-first support (Edge, PowerShell and cmd fallbacks, and a CI job that runs the installers on Windows), crash resume, multi-root workspaces and recovery from stalled or closed tabs.</li>
 <li><strong>Trace Studios</strong>: a photo-booth platform with capture, digital sharing and thermal printing from a Raspberry Pi. Uploads are HMAC-signed and the booth syncs with the cloud.</li>
-<li><a href="https://github.com/aayxshkumar/ai-hedge-fund/tree/improve-decision-making"><strong>ai-hedge-fund, extended</strong></a>: I extended virattt/ai-hedge-fund to Indian equities: Yahoo Finance in place of the paid data API, NSE/BSE ticker resolution and a read-only Zerodha login.</li>
+<li><a href="https://github.com/aayxshkumar/ai-hedge-fund/tree/improve-decision-making"><strong>ai-hedge-fund, extended</strong></a>: I extended virattt/ai-hedge-fund to Indian equities: Yahoo Finance in place of the paid data API, NSE/BSE ticker resolution and a Zerodha (Kite Connect) integration with paper and live trading modes.</li>
 </ul>
 
 <h2 id="contact"><a href="#contact">Contact</a></h2>
 
-<p>Email is best: <a href="mailto:aayushkumr25@gmail.com">aayushkumr25@gmail.com</a>. Also <a href="https://github.com/aayxshkumar">GitHub</a> and <a href="https://linkedin.com/in/aayush-kumr">LinkedIn</a>.</p>
+<p>Email is best: <a href="mailto:aayushkumr25@gmail.com">aayushkumr25@gmail.com</a>. Also <a href="https://github.com/aayxshkumar">GitHub</a> and <a href="https://www.linkedin.com/in/aayush-kumr">LinkedIn</a>.</p>
 
 </main>
 <footer>
 <ul class="links"><li><a href="now.html">Now</a></li><li><a href="colophon.html">Colophon</a></li><li><a href="claims.html">Claims</a></li><li><a href="atom.xml">Feed</a></li></ul>
-<p>Updated <time datetime="2026-10-29">29 October 2026</time>.</p>
+<p>Updated <time datetime="2026-10-30">30 October 2026</time>.</p>
 </footer>
 <script src="stepper.js" defer></script>
 </body>
