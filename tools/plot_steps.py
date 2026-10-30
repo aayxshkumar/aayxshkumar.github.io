@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Mixed-workload throughput per version, as horizontal bars, from the lob-engine README at 2178cef.
+"""Mixed-workload throughput per version, as horizontal bars. ROWS are copied by hand from
+lob-engine's committed runs: bench.json at e12cc5d for v0 and v2, at 752c2cf (branch v1-random)
+for v1. Each figure is the median of 10 interleaved repetitions, with the book and id table
+sized for 262,144 orders.
 
     python3 tools/plot_steps.py steps.svg
     python3 tools/plot_steps.py steps-narrow.svg --narrow
@@ -11,9 +14,9 @@ as everywhere on the site; v1 is grey. Direct labels, no legend box.
 import sys
 
 ROWS = [  # (version, change, sequential ids, random-looking ids), M ops/s
-    ("v0", "std::map levels", 21.2, 20.0, "v0"),
-    ("v1", "arrays + bitset", 34.3, 30.4, "v1"),
-    ("v2", "+ id table", 67.5, 60.1, "v2"),
+    ("v0", "std::map levels", 20.9, 19.9, "v0"),
+    ("v1", "arrays + bitset", 35.7, 31.2, "v1"),
+    ("v2", "+ id table", 65.2, 56.2, "v2"),
 ]
 FONT = "Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif"
 STYLE = (
@@ -34,8 +37,9 @@ def main():
     XMAX = 70.0
     H = T + ROW * len(ROWS) + 44
     x = lambda v: L + v / XMAX * (W - L - R)
-    title = ("Mixed-workload throughput by version on an Apple M4, millions of operations a second. "
-             "Sequential ids: v0 21.2, v1 34.3, v2 67.5. Random-looking ids: v0 20.0, v1 30.4, v2 60.1.")
+    title = ("Mixed-workload throughput by version on an Apple M4, millions of operations a second, "
+             "median of 10 runs. " + "Sequential ids: " + ", ".join(f"{r[0]} {r[2]}" for r in ROWS)
+             + ". Random-looking ids: " + ", ".join(f"{r[0]} {r[3]}" for r in ROWS) + ".")
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" '
          f'aria-labelledby="t" font-family="{FONT}" font-size="{fs}">', f'<title id="t">{title}</title>', STYLE]
     base = T + ROW * len(ROWS)

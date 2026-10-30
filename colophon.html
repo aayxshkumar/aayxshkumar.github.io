@@ -14,6 +14,7 @@
 <meta property="og:image" content="https://aayxshkumar.github.io/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="From 21M to 65M ops/s: two changes to a C++ order book. Bars for std::map levels 20.9M, arrays + bitset 35.7M and id table 65.2M ops/s on an Apple M4, median of 10 runs.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Aayush Kumar">
 <link rel="icon" href="favicon-96.png" sizes="96x96" type="image/png">
@@ -42,9 +43,9 @@
 <p>Every headline number on the site is listed in <a href="receipts.json">receipts.json</a>, with what backs it, and the <a href="claims.html">claims ledger</a> is generated from that file by <code>build.py</code>. <code>build.py --check</code> fails if a page still carries a number this site has corrected.</p>
 
 <h2 id="built"><a href="#built">How it’s built</a></h2>
-<p>A handful of HTML files, one stylesheet and two small scripts, served by GitHub Pages. No framework, no web fonts, no analytics, no cookies, and no requests to anyone else’s server. The charts are SVGs written by short Python scripts, from lob-engine’s committed CSV or the numbers in its README. The step-through on the home page ports lob-engine’s matching rules to JavaScript, and does nothing until you click; without JavaScript, the table above it says the same thing.</p>
+<p>A handful of HTML files, one stylesheet and two small scripts, served by GitHub Pages. No framework, no web fonts, no analytics, no cookies, and no requests to anyone else’s server. The charts are SVGs written by short Python scripts, from lob-engine’s committed CSV or from figures copied out of its committed benchmark output. The step-through on the home page ports lob-engine’s matching rules to JavaScript, and does nothing until you click; without JavaScript, the table above it says the same thing.</p>
 <p>Pages prefetch on hover and cross-fade in Chrome and Safari; other browsers load them normally. Nothing animates if your system asks for reduced motion.</p>
-<p><!-- weight -->The home page is 19.3 KB of HTML, CSS and JavaScript, compressed, plus 1.1 KB for its chart and icon. It loads no fonts.<!-- /weight --></p>
+<p><!-- weight -->The home page is 19.6 KB of HTML, CSS and JavaScript, compressed, plus 1.1 KB for its chart and icon. It loads no fonts.<!-- /weight --></p>
 
 <h2 id="ai"><a href="#ai">AI</a></h2>
 <p>Much of the code in lob-engine and on this site was written with Claude Code, Anthropic’s AI coding assistant, working from my direction. So far that is every commit in both repositories, and each one says so in a <code>Co-Authored-By: Claude</code> trailer. The numbers come from runs on my own machine, and the <a href="claims.html">claims ledger</a> shows which of them you can check yourself.</p>
@@ -63,7 +64,7 @@
 </main>
 <footer>
 <ul class="links"><li><a href="./">Home</a></li><li><a href="now.html">Now</a></li><li><a href="claims.html">Claims</a></li><li><a href="atom.xml">Feed</a></li></ul>
-<p>Updated <time datetime="2026-10-29">29 October 2026</time>.</p>
+<p>Updated <time datetime="2026-10-30">30 October 2026</time>.</p>
 </footer>
 </body>
 </html>

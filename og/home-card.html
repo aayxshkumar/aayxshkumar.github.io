@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="light">
+<style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden;background:#fff;color:#111;font-family:Charter,"Bitstream Charter","Sitka Text",Cambria,serif}
+.f{position:absolute;left:72px;right:72px;top:0;bottom:0}
+.k{position:absolute;left:0;top:63px;margin:0;font-size:28px;line-height:36px;color:#555}
+h1{position:absolute;left:0;top:127px;margin:0;font-size:60px;line-height:66.5px;font-weight:700;max-width:860px}
+.c{position:absolute;left:0;right:0;top:395px}
+.row{position:relative;height:45px;font-variant-numeric:tabular-nums}
+.l{position:absolute;left:0;top:-5px;font-size:26px;line-height:36px;color:#333}
+.b{position:absolute;left:320px;top:0;height:26px;background:#1f5fa8}
+.v{position:absolute;right:0;top:-5px;font-size:26px;line-height:36px;color:#111}
+.n{position:absolute;left:0;top:538px;margin:0;font-size:22px;line-height:30px;color:#555}
+</style></head><body><div class="f">
+<p class="k">Aayush Kumar · aayxshkumar.github.io</p>
+<h1>From 21M to 65M ops/s: two changes to a C++ order book</h1>
+<div class="c">
+<div class="row"><span class="l">v0 std::map levels</span><span class="b" style="width:181px"></span><span class="v">20.9M</span></div>
+<div class="row"><span class="l">v1 arrays + bitset</span><span class="b" style="width:310px"></span><span class="v">35.7M</span></div>
+<div class="row"><span class="l">v2 + id table</span><span class="b" style="width:566px"></span><span class="v">65.2M</span></div>
+</div>
+<p class="n">Apple M4, 1M-op mixed workload, median of 10 runs. Raw output in the repo.</p>
+</div></body></html>

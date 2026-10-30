@@ -1,42 +1,73 @@
 {
   "source": {
     "repo": "https://github.com/aayxshkumar/lob-engine",
-    "sha": "2178cef"
+    "sha": "e12cc5d"
   },
-  "machine": "Apple M4, macOS 26, Apple clang 17, -O3",
-  "raw": {
-    "path": "bench/results/2026-10-29-m4-9d27e87",
-    "sha": "129ef11",
-    "note": "a rerun of code identical to 2178cef, same machine",
-    "benches": [
-      "v0_map/mixed/1000000/262144",
-      "v2/mixed/1000000/262144",
-      "v0_map/mixed_random_ids/1000000/262144",
-      "v2/mixed_random_ids/1000000/262144",
-      "v0_map/add_passive/100000",
-      "v2/add_passive/100000",
-      "v0_map/add_cancel",
-      "v2/add_cancel",
-      "v0_map/sparse_sweep/1000",
-      "v2/sparse_sweep/1000",
-      "v2/mixed/1000000/0"
-    ]
-  },
+  "machine": "Apple M4, macOS 26, Apple clang 17, -O3, one thread",
+  "statistic": "median of 10 interleaved repetitions (for the replay, of 5 runs)",
+  "conditions": "The machine was not idle: each of the four runs from 29–30 October started with a load average of 2.4 to 3.8, and where other processes were sampled, Spotlight indexing held about one core. Ratios between versions are stable (v0 agrees within 1% across branches, and main’s two runs within 2%); absolute figures may be a few percent low.",
+  "raw": [
+    {
+      "path": "bench/results/2026-10-30-m4-5cbfc0c",
+      "sha": "e12cc5d",
+      "note": "tools/run_bench.sh at 5cbfc0c",
+      "benches": [
+        "v0_map/mixed/1000000/262144",
+        "v2/mixed/1000000/262144",
+        "v0_map/mixed_random_ids/1000000/262144",
+        "v2/mixed_random_ids/1000000/262144",
+        "v2/mixed/1000000/0",
+        "v0_map/add_passive/100000",
+        "v2/add_passive/100000",
+        "v0_map/add_cancel",
+        "v2/add_cancel",
+        "v0_map/sparse_sweep/1/manual_time",
+        "v2/sparse_sweep/1/manual_time",
+        "v0_map/sparse_sweep/100/manual_time",
+        "v2/sparse_sweep/100/manual_time",
+        "v0_map/sparse_sweep/1000/manual_time",
+        "v2/sparse_sweep/1000/manual_time"
+      ],
+      "files": [
+        "bench.json",
+        "replay.txt"
+      ]
+    },
+    {
+      "path": "bench/results/2026-10-29-m4-56199b6",
+      "sha": "752c2cf",
+      "note": "tools/run_bench.sh at 56199b6, branch v1-random",
+      "benches": [
+        "v1_array/mixed/1000000/262144",
+        "v1_array/mixed_random_ids/1000000/262144",
+        "v1_array/mixed/1000000/0",
+        "v1_array/add_passive/100000",
+        "v1_array/add_cancel",
+        "v1_array/sparse_sweep/1/manual_time",
+        "v1_array/sparse_sweep/100/manual_time",
+        "v1_array/sparse_sweep/1000/manual_time"
+      ],
+      "files": [
+        "bench.json"
+      ]
+    }
+  ],
   "claims": {
     "c-mixed": {
       "label": "Mixed workload, v0 and v2",
-      "value": "21.2M → 67.5M ops/s (3.2×)",
+      "value": "20.9M → 65.2M ops/s (3.1×)",
       "bench": [
         "v0_map/mixed/1000000/262144",
         "v2/mixed/1000000/262144"
       ],
-      "statistic": "median of 3 repetitions",
-      "sizing": "book sized for 262,144 orders",
+      "statistic": "median of 10 interleaved repetitions",
+      "sizing": "book and id table sized for 262,144 orders",
       "published": [
         "README.md",
-        "41bf158"
+        "ef0c364"
       ],
-      "status": "rerun public at 129ef11",
+      "status": "raw output public at e12cc5d",
+      "earlier": "21.2M → 67.5M ops/s (3.2×), median of 3; that raw output wasn’t kept",
       "used": [
         [
           "home",
@@ -46,23 +77,22 @@
           "write-up",
           "order-book-3x.html#summary"
         ]
-      ],
-      "rerun": "21.6M → 70.2M"
+      ]
     },
     "c-mixed-v1": {
       "label": "Mixed workload, v1",
-      "value": "34.3M ops/s",
+      "value": "35.7M ops/s",
       "bench": [
-        "v1_array/mixed/1000000"
+        "v1_array/mixed/1000000/262144"
       ],
-      "at": "ffe9956",
-      "statistic": "median of 3 repetitions",
-      "sizing": "book sized for all 1M operations; v0 and v2 are sized for 262,144",
+      "statistic": "median of 10 interleaved repetitions",
+      "sizing": "book sized for 262,144 orders, like v0 and v2; the v1 book code of ffe9956 with main’s benchmark harness, on branch v1-random",
       "published": [
         "README.md",
-        "41bf158"
+        "ef0c364"
       ],
-      "status": "README only",
+      "status": "raw output public at 752c2cf",
+      "earlier": "34.3M ops/s, median of 3, book sized for 1M; that raw output wasn’t kept",
       "used": [
         [
           "home",
@@ -76,18 +106,20 @@
     },
     "c-random": {
       "label": "Mixed workload, random-looking ids",
-      "value": "20.0M / 30.4M / 60.1M ops/s",
+      "value": "19.9M / 31.2M / 56.2M ops/s",
       "bench": [
         "v0_map/mixed_random_ids/1000000/262144",
+        "v1_array/mixed_random_ids/1000000/262144",
         "v2/mixed_random_ids/1000000/262144"
       ],
-      "statistic": "median of 3 repetitions",
-      "sizing": "ids scrambled with the splitmix64 finaliser; the v1 figure is from a v1 build with scrambling that was never committed (ffe9956 has no random-id benchmark), and another run gave 25.7M",
+      "statistic": "median of 10 interleaved repetitions",
+      "sizing": "ids scrambled with the splitmix64 finaliser; book and id table sized for 262,144 orders",
       "published": [
         "README.md",
-        "41bf158"
+        "ef0c364"
       ],
-      "status": "README only; v0, v2 rerun public at 129ef11",
+      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "earlier": "20.0M / 30.4M / 60.1M ops/s, median of 3; the v1 figure came from a build that was never committed",
       "used": [
         [
           "home",
@@ -97,22 +129,23 @@
           "write-up",
           "order-book-3x.html#steps"
         ]
-      ],
-      "rerun": "20.2M → 61.9M"
+      ]
     },
     "c-oversized": {
       "label": "v2 with the id table sized for 1M",
-      "value": "34.4M ops/s, against 34.4M for v1; rerun 37.7M",
+      "value": "36.0M ops/s, against 35.5M for v1",
       "bench": [
+        "v1_array/mixed/1000000/0",
         "v2/mixed/1000000/0"
       ],
-      "statistic": "median of 3 repetitions",
+      "statistic": "median of 10 interleaved repetitions",
       "sizing": "book and id table sized for all 1M operations (2^21 slots, 32 MB)",
       "published": [
         "README.md",
-        "2178cef"
+        "ef0c364"
       ],
-      "status": "README only; v2 rerun public at 129ef11",
+      "status": "raw output public at e12cc5d (v2) and 752c2cf (v1)",
+      "earlier": "34.4M ops/s against 34.4M for v1, median of 3; a rerun gave v2 37.7M",
       "used": [
         [
           "home",
@@ -122,44 +155,46 @@
           "write-up",
           "order-book-3x.html#v2"
         ]
-      ],
-      "rerun": "37.7M"
+      ]
     },
     "c-passive": {
       "label": "Passive adds, 100k orders",
-      "value": "35.6M / 39.5M / 158M ops/s",
+      "value": "35.1M / 38.7M / 160M ops/s",
       "bench": [
         "v0_map/add_passive/100000",
+        "v1_array/add_passive/100000",
         "v2/add_passive/100000"
       ],
-      "statistic": "median of 3 repetitions",
+      "statistic": "median of 10 interleaved repetitions",
       "published": [
         "README.md",
-        "2178cef"
+        "ef0c364"
       ],
-      "status": "rerun public at 129ef11",
+      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "earlier": "35.6M / 39.5M / 158M ops/s, median of 3",
       "used": [
         [
           "home",
           "index.html#results"
         ]
-      ],
-      "rerun": "35.1M → 161M"
+      ]
     },
     "c-addcancel": {
       "label": "Add + cancel, warm book",
-      "value": "32.6 / 28.5 / 8.6 ns",
+      "value": "32.9 / 28.8 / 9.4 ns",
       "bench": [
         "v0_map/add_cancel",
+        "v1_array/add_cancel",
         "v2/add_cancel"
       ],
-      "statistic": "median of 3 repetitions",
-      "sizing": "one order beside 200 resting ones; v1 at ffe9956",
+      "statistic": "median of 10 interleaved repetitions",
+      "sizing": "one order beside 200 resting ones",
       "published": [
         "README.md",
-        "2178cef"
+        "ef0c364"
       ],
-      "status": "rerun public at 129ef11",
+      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "earlier": "32.6 / 28.5 / 8.6 ns, median of 3",
       "used": [
         [
           "home",
@@ -169,47 +204,48 @@
           "write-up",
           "order-book-3x.html#summary"
         ]
-      ],
-      "rerun": "32.4 → 8.59 ns"
+      ]
     },
     "c-sweep": {
       "label": "Sparse sweep, 50 levels",
-      "value": "2.0 µs map; v1 22.5 µs with the scan bug, 1.5–1.85 µs with the bitset; v2 1.28 µs at 1,000-tick gaps",
+      "value": "v0 1.57 µs, v1 1.20 µs, v2 0.60 µs at 1,000-tick gaps",
       "bench": [
-        "v0_map/sparse_sweep/1000",
-        "v2/sparse_sweep/1000"
+        "v0_map/sparse_sweep/1000/manual_time",
+        "v1_array/sparse_sweep/1000/manual_time",
+        "v2/sparse_sweep/1000/manual_time"
       ],
-      "statistic": "median of 3 repetitions",
-      "sizing": "v1 numbers stated in the README at 0f928f8; the linear-scan builds were never committed (0a8bdc2 already has the bitset)",
+      "statistic": "median of 10 interleaved repetitions",
+      "sizing": "since 5cbfc0c the harness times only the sweep, so these can’t be compared with earlier sweep figures",
       "published": [
         "README.md",
-        "0f928f8"
+        "ef0c364"
       ],
-      "status": "README only; v0, v2 rerun public at 129ef11",
+      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "earlier": "timed with the timer’s pause-and-resume overhead and teardown, median of 3: 2.0 µs map; v1 22.5 µs with the linear-scan bug, 1.5–1.85 µs with the bitset; v2 1.28 µs; the linear-scan build was never committed (0a8bdc2 already has the bitset), and its figure is in the README at 0f928f8",
       "used": [
         [
-          "home",
+          "home (the earlier figure)",
           "index.html#full-band-scan"
         ],
         [
           "write-up",
           "order-book-3x.html#sparse"
         ]
-      ],
-      "rerun": "v0 2.0 µs, v2 1.20 µs at 1,000-tick gaps"
+      ]
     },
     "c-replay": {
       "label": "Real-data replay, v0 and v2",
-      "value": "15.9M → 81.9M ops/s (5.2×); v1 not run",
+      "value": "14.7M → 79.4M ops/s (5.4×); v1 not run",
       "command": "./build/lob_replay data/btcusdt.lobrec",
       "statistic": "median of 5 runs",
-      "sizing": "562,850 order operations from 20 minutes of Binance BTCUSDT, 29 October 2026, 02:30–02:50 UTC",
+      "sizing": "562,850 order operations from 20 minutes of Binance BTCUSDT, 29 October 2026, 02:30–02:50 UTC; at most 4,203 orders rest at once, so the whole book fits in cache",
       "published": [
         "README.md",
-        "2178cef"
+        "ef0c364"
       ],
-      "status": "README only; rerun output public at 129ef11",
+      "status": "raw output public at e12cc5d",
       "missing": "the recording isn’t published",
+      "earlier": "15.9M → 81.9M ops/s (5.2×), code at 9014c87; that raw output wasn’t kept",
       "used": [
         [
           "home",
@@ -220,8 +256,7 @@
           "order-book-3x.html#replay"
         ]
       ],
-      "rerun_file": "replay.txt",
-      "rerun": "14.5M → 80.1M (5.5×)"
+      "raw_file": "replay.txt"
     },
     "c-match": {
       "label": "Top 10 levels match the exchange",
@@ -231,7 +266,7 @@
         "README.md",
         "2178cef"
       ],
-      "status": "README only",
+      "status": "raw output public at e12cc5d",
       "missing": "the recording isn’t published; CI runs the same check, strict, on a synthetic file",
       "used": [
         [
@@ -243,8 +278,7 @@
           "order-book-3x.html#real-data"
         ]
       ],
-      "rerun_file": "replay.txt",
-      "rerun": "99.93%"
+      "raw_file": "replay.txt"
     },
     "c-ticks": {
       "label": "add_limit readings of 0 ticks",

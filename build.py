@@ -3,9 +3,10 @@
 output is committed, and GitHub Pages serves the files as they are.
 
     python3 build.py           # the ledger from receipts.json, atom.xml, sitemap.xml, the weight line
-    python3 build.py --og      # og-order-book-3x.png from og/order-book-3x.html
+    python3 build.py --og      # og.png from og/home-card.html, og-order-book-3x.png from og/order-book-3x.html
     python3 build.py --pdf     # order-book-3x.pdf, A4, from the page's print styles
-    python3 build.py --check   # exit 1 on a stale block, a banned string or a missing image size
+    python3 build.py --check   # exit 1 on a stale block, a banned string, an old figure, a dead ledger
+                               # link or a missing image size
     python3 build.py --all
 
 --og and --pdf need a Chrome or Chromium binary: set CHROME, or it uses
@@ -14,7 +15,9 @@ never your own.
 
 receipts.json is the list of every number on the site and what backs it.
 claims.html is generated from it; --check fails when a page carries a number
-string this site has retracted, so a correction can't be half-made.
+string this site has retracted, so a correction can't be half-made. The figures
+replaced on 30 October 2026 (OLD below) may stay only as history: in a post's
+<ol class="revisions"> or in a ledger row's "Earlier figure" line.
 """
 
 import gzip
@@ -29,19 +32,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SITE = "https://aayxshkumar.github.io/"
-UPDATED = "2026-10-29"
+UPDATED = "2026-10-30"
 TZ = "+05:30"
 
-# The feed: posts, then Log notes that point into them.
+# The feed: posts, then Log notes that point into them. An optional fifth field is the
+# date an entry was last updated, when that differs from the date it was published.
 ENTRIES = [
-    ("From 21M to 68M ops/s: two changes to a C++ order book", "order-book-3x.html", "2026-10-29",
-     "Flat price-level arrays and an open-addressing id table took a C++20 order book from 21.2M to 67.5M ops/s; one step was slower first."),
+    ("From 21M to 65M ops/s: two changes to a C++ order book", "order-book-3x.html", "2026-10-29",
+     "Flat price-level arrays and an open-addressing id table took a C++20 order book from 20.9M to 65.2M ops/s; one step was slower first.",
+     "2026-10-30"),
     ("Replaying 20 minutes of Binance BTCUSDT", "#real-data", "2026-10-29",
-     "562,850 order operations: v2 at 81.9M ops/s against 15.9M for std::map."),
+     "562,850 order operations: v2 at 79.4M ops/s against 14.7M for std::map, on a book of at most 4,203 orders, small enough to fit in cache. Speeds from the 30 October rerun at e12cc5d.",
+     "2026-10-30"),
     ("v2: an open-addressing id table, and the 32 MB table that hid its gain", "#id-table", "2026-10-29",
-     "Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is about twice as fast as v1."),
+     "Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is 1.8× as fast as v1. Speeds from the 30 October reruns at e12cc5d and, for v1, 752c2cf.",
+     "2026-10-30"),
     ("A benchmark found a full-band scan in my “faster” version", "#full-band-scan", "2026-10-28",
-     "Clearing the last ask scanned all 65,536 ticks: 22.5 µs a sweep against 2.0 µs for std::map."),
+     "Clearing the last ask scanned all 65,536 ticks: 22.5 µs a sweep against 2.0 µs for std::map, as the benchmark timed it then.",
+     "2026-10-30"),
     ("Apple Silicon’s steady_clock ticks every 41.7 ns", "#steady-clock", "2026-10-28",
      "My p50 came out at exactly one tick of a 24 MHz clock."),
     ("My first differential test passed with a planted bug in it", "#first-differential-test", "2026-10-28",
@@ -64,14 +72,14 @@ def feed():
            f'  <link href="{SITE}"/>',
            f"  <updated>{UPDATED}T00:00:00{TZ}</updated>",
            "  <author><name>Aayush Kumar</name></author>"]
-    for title, href, date, summary in ENTRIES:
+    for title, href, date, summary, *upd in ENTRIES:
         url = SITE + href
         out += ["  <entry>",
                 f"    <title>{esc(title)}</title>",
                 f"    <id>{url}</id>",
                 f'    <link href="{url}"/>',
                 f"    <published>{date}T00:00:00{TZ}</published>",
-                f"    <updated>{date}T00:00:00{TZ}</updated>",
+                f"    <updated>{(upd or [date])[0]}T00:00:00{TZ}</updated>",
                 f"    <summary>{esc(summary)}</summary>",
                 "  </entry>"]
     out.append("</feed>")
@@ -105,6 +113,8 @@ def weight():
 # ---- The ledger -------------------------------------------------------------
 DATA = json.loads((ROOT / "receipts.json").read_text(encoding="utf-8"))
 REPO = DATA["source"]["repo"]
+# Ledger history lines start with this, and only these lines may quote an OLD figure.
+EARLIER = "Earlier figure, replaced on 30 October 2026: "
 
 
 def link(path, sha):
@@ -116,7 +126,8 @@ def evidence(c):
     ev = []
     if "bench" in c:
         at = f' at <a href="{REPO}/tree/{c["at"]}">{c["at"]}</a>' if "at" in c else ""
-        ev.append(" and ".join(f"<code>{esc(b).replace('/', '/<wbr>')}</code>" for b in c["bench"]) + at)
+        names = [f"<code>{esc(b).replace('/', '/<wbr>')}</code>" for b in c["bench"]]
+        ev.append(", ".join(names[:-1]) + (" and " if len(names) > 1 else "") + names[-1] + at)
     elif "command" in c:
         ev.append(f"<code>{esc(c['command'])}</code>")
     if "sizing" in c:
@@ -127,15 +138,24 @@ def evidence(c):
         ev.append(link(*c["data"]))
     if "published" in c:
         ev.append("published in the " + link(*c["published"]))
-    raw = DATA.get("raw")
-    if raw and (any(b in raw["benches"] for b in c.get("bench", [])) or "rerun_file" in c):
-        path = raw["path"] + "/" + c.get("rerun_file", "bench.json")
-        ev.append(f'raw output of {raw["note"]}, {esc(c["rerun"])}: {link(path, raw["sha"])}')
-    elif "bench" in c or c.get("command", "").startswith("./build/lob_replay"):
+    found = False
+    for run in DATA.get("raw", []):
+        if any(b in run["benches"] for b in c.get("bench", [])):
+            name = "bench.json"
+        elif c.get("raw_file") in run["files"]:
+            name = c["raw_file"]
+        else:
+            continue
+        found = True
+        ev.append(f'raw output of {esc(run["note"])}: {link(run["path"] + "/" + name, run["sha"])}')
+    if not found and ("bench" in c or c.get("command", "").startswith("./build/lob_replay")):
         ev.append('raw output <span class="missing">not committed yet</span>')
     if "missing" in c:
         ev.append(f'<span class="missing">{esc(c["missing"])}</span>')
-    return "".join(f'<span class="ev">{e}</span>' for e in ev) or "none can be published"
+    out = "".join(f'<span class="ev">{e}</span>' for e in ev)
+    if "earlier" in c:
+        out += f'<span class="ev history">{esc(EARLIER + c["earlier"])}</span>'
+    return out or "none can be published"
 
 
 def ledger():
@@ -149,7 +169,13 @@ def ledger():
     return "\n".join(rows)
 
 
+def conditions():
+    return esc(f'Every benchmark ran on an {DATA["machine"]}; each figure is the {DATA["statistic"]}. '
+               + DATA["conditions"])
+
+
 def blocks(src):
+    src = re.sub(r"(<!-- num:conditions -->).*?(<!-- /num -->)", lambda m: m[1] + conditions() + m[2], src, flags=re.S)
     return re.sub(r"(<!-- num:ledger -->).*?(<!-- /num -->)", lambda m: m[1] + "\n" + ledger() + "\n" + m[2], src, flags=re.S)
 
 
@@ -164,8 +190,8 @@ def numbers():
 # Strings this site has retracted or never wants again.
 BANNED = [
     ("40% faster", "no committed run gives it"),
-    ("256k orders", "v0 and v2 are sized for 262,144; v1 for 1M"),
-    ("Book sized for 256k", "v0 and v2 are sized for 262,144; v1 for 1M"),
+    ("256k orders", "the books are sized for 262,144"),
+    ("Book sized for 256k", "the books are sized for 262,144"),
     ("56%", "the CDF share is 55.5%"),
     ("16.5%", "the CDF share is 16.4%"),
     ('class="draft"', "a placeholder is still on the page"),
@@ -176,6 +202,30 @@ BANNED = [
     ("no faster with sequential ids", "the committed rerun is 1.1x"),
     ("whole book after every step", "say what the test compares"),
 ]
+
+# The median-of-3 figures whose raw output wasn't kept, replaced on 30 October 2026 by the
+# committed runs at e12cc5d and 752c2cf. Bare decimals are matched too, for table cells.
+OLD_FIGURES = ("21.2", "34.3", "67.5", "81.9", "15.9", "60.1", "30.4", "37.7", "34.4", "8.6")
+OLD = re.compile(r"(?<![\w.,])(?:(?:" + "|".join(map(re.escape, OLD_FIGURES)) + r")(?!\d)"
+                 r"|68M|[35]\.2(?:\s|&#8288;|&nbsp;|\u2060|\u202f)*(?:×|&times;|x\b|times\b))")
+# Where an OLD figure may stay: a post's list of revisions and a ledger row's history line.
+HISTORY = re.compile(r'<ol class="revisions">.*?</ol>|<span class="ev history">' + re.escape(esc(EARLIER))
+                     + r'[^<]*</span>', re.S)
+
+
+def old_figures(name, text, history=True):
+    """Every OLD figure in text outside the places history may live, as 'file:line: ...' strings."""
+    allowed = [m.span() for m in HISTORY.finditer(text)] if history else []
+    return [f"{name}:{text.count(chr(10), 0, m.start()) + 1}: {m[0]!r} (an old figure outside Revisions)"
+            for m in OLD.finditer(text) if not any(a <= m.start() < b for a, b in allowed)]
+
+
+def json_strings(node, skip):
+    if isinstance(node, dict):
+        return [s for k, v in node.items() if k not in skip for s in json_strings(v, skip)]
+    if isinstance(node, list):
+        return [s for v in node for s in json_strings(v, skip)]
+    return [node] if isinstance(node, str) else []
 
 
 def check():
@@ -198,6 +248,17 @@ def check():
         for t in re.findall(r"<table.*?</table>", src, re.S):
             if 'class="num"' in t:
                 bad.append(f"{page}: a method popover inside a table")
+        bad += old_figures(page, src)
+    bad += old_figures("atom.xml", (ROOT / "atom.xml").read_text(encoding="utf-8"), history=False)
+    for svg in sorted(ROOT.glob("*.svg")):  # what the chart says, not its coordinates
+        bad += old_figures(svg.name, re.sub(r"<[^>]*>", " ", svg.read_text(encoding="utf-8")), history=False)
+    bad += [f"receipts.json: {m[0]!r} (an old figure outside an \"earlier\" field)"
+            for s in json_strings(DATA, {"earlier"}) for m in OLD.finditer(s)]
+    for cid, c in DATA["claims"].items():
+        for _, href in c["used"]:
+            page, _, frag = href.partition("#")
+            if frag and f'id="{frag}"' not in (ROOT / page).read_text(encoding="utf-8"):
+                bad.append(f"receipts.json: {cid} points at {href}, which doesn't exist")
     ai = re.search(r'<h2 id="ai">.*?</h2>\s*<p>(.*?)</p>', (ROOT / "colophon.html").read_text(encoding="utf-8"), re.S)
     if not ai or len(re.sub(r"<[^>]+>", "", ai[1]).split()) < 40:
         bad.append("colophon.html: the AI note is missing or under 40 words")
@@ -219,8 +280,9 @@ def chrome(*args):
 
 
 def og():
-    # og.png, the home card, is kept as it is; og/home-candidate.png is an unpublished alternative.
-    for src, out in (("og/order-book-3x.html", "og-order-book-3x.png"),):
+    # og.png, the home card, comes from og/home-card.html; og/home-candidate.png (from og/home.html)
+    # is an unpublished alternative and isn't rendered here.
+    for src, out in (("og/home-card.html", "og.png"), ("og/order-book-3x.html", "og-order-book-3x.png")):
         chrome("--window-size=1200,630", "--force-device-scale-factor=1",
                f"--screenshot={ROOT / out}", (ROOT / src).as_uri())
 
