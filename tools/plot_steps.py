@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Mixed-workload throughput per version, as horizontal bars. ROWS are copied by hand from
-lob-engine's committed runs: bench.json at e12cc5d for v0 and v2, at 752c2cf (branch v1-random)
+lob-engine's committed runs: bench.json at 2265115 for v0 and v2, at 103a6b0 (branch v1-random)
 for v1. Each figure is the median of 10 interleaved repetitions, with the book and id table
 sized for 262,144 orders.
 

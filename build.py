@@ -42,10 +42,10 @@ ENTRIES = [
      "Flat price-level arrays and an open-addressing id table took a C++20 order book from 20.9M to 65.2M ops/s; one step was slower first.",
      "2026-10-30"),
     ("Replaying 20 minutes of Binance BTCUSDT", "#real-data", "2026-10-29",
-     "562,850 order operations: v2 at 79.4M ops/s against 14.7M for std::map, on a book of at most 4,203 orders, small enough to fit in cache. Speeds from the 30 October rerun at e12cc5d.",
+     "562,850 order operations: v2 at 79.4M ops/s against 14.7M for std::map, on a book of at most 4,203 orders, small enough to fit in cache. Speeds from the 30 October rerun at 2265115.",
      "2026-10-30"),
     ("v2: an open-addressing id table, and the 32 MB table that hid its gain", "#id-table", "2026-10-29",
-     "Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is 1.8× as fast as v1. Speeds from the 30 October reruns at e12cc5d and, for v1, 752c2cf.",
+     "Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is 1.8× as fast as v1. Speeds from the 30 October reruns at 2265115 and, for v1, 103a6b0.",
      "2026-10-30"),
     ("A benchmark found a full-band scan in my “faster” version", "#full-band-scan", "2026-10-28",
      "Clearing the last ask scanned all 65,536 ticks: 22.5 µs a sweep against 2.0 µs for std::map, as the benchmark timed it then.",
@@ -204,7 +204,7 @@ BANNED = [
 ]
 
 # The median-of-3 figures whose raw output wasn't kept, replaced on 30 October 2026 by the
-# committed runs at e12cc5d and 752c2cf. Bare decimals are matched too, for table cells.
+# committed runs at 2265115 and 103a6b0. Bare decimals are matched too, for table cells.
 OLD_FIGURES = ("21.2", "34.3", "67.5", "81.9", "15.9", "60.1", "30.4", "37.7", "34.4", "8.6")
 OLD = re.compile(r"(?<![\w.,])(?:(?:" + "|".join(map(re.escape, OLD_FIGURES)) + r")(?!\d)"
                  r"|68M|[35]\.2(?:\s|&#8288;|&nbsp;|\u2060|\u202f)*(?:×|&times;|x\b|times\b))")

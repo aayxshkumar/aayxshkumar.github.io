@@ -35,7 +35,7 @@
 <p><a href="./">Aayush Kumar</a></p>
 
 <h1>From 21M to 65M ops/s: two changes to a C++ order book</h1>
-<p class="meta"><time datetime="2026-10-29">29 October 2026</time>. Throughput numbers from lob-engine at <a href="https://github.com/aayxshkumar/lob-engine/tree/e12cc5d">e12cc5d</a> and, for v1, <a href="https://github.com/aayxshkumar/lob-engine/tree/752c2cf">752c2cf</a>. <span class="noprint"><a href="order-book-3x.pdf">PDF, A4</a>.</span></p>
+<p class="meta"><time datetime="2026-10-29">29 October 2026</time>. Throughput numbers from lob-engine at <a href="https://github.com/aayxshkumar/lob-engine/tree/2265115">2265115</a> and, for v1, <a href="https://github.com/aayxshkumar/lob-engine/tree/103a6b0">103a6b0</a>. <span class="noprint"><a href="order-book-3x.pdf">PDF, A4</a>.</span></p>
 
 <p>I’m building <a href="https://github.com/aayxshkumar/lob-engine">lob-engine</a>, a limit order book in C++20, to learn how matching engines are made fast. This is a log of the first two optimisations, with the numbers at each step, the step that made things slower, the benchmark that turned out to be too kind, and a replay of 20 minutes of real exchange data. Every lob-engine commit is co-authored with Claude Code; the <a href="colophon.html#ai">colophon</a> says how.</p>
 
@@ -48,14 +48,14 @@
 <tr><th scope="row">v2</th><td class="t">open-addressing id table</td><td><strong>65.2</strong></td><td><strong>9.4</strong></td></tr>
 </tbody>
 </table>
-<p class="cap"><b>3.1× on the mixed workload, 3.5× on add + cancel.</b> 1M seeded operations: 55% limit orders near the mid, 40% cancels, 5% market orders. Apple M4, Apple clang 17, <code>-O3</code>, median of 10 interleaved repetitions, on a machine that <a href="#limits">wasn’t idle</a>. For the mixed workload, all three sized for 262,144 orders; add + cancel runs on a warm book of 200 resting orders. v0 and v2 at <a href="https://github.com/aayxshkumar/lob-engine/tree/e12cc5d/bench/results/2026-10-30-m4-5cbfc0c">e12cc5d</a>; v1, the book from ffe9956, at <a href="https://github.com/aayxshkumar/lob-engine/tree/752c2cf/bench/results/2026-10-29-m4-56199b6">752c2cf</a> on branch v1-random. Receipts: <a href="claims.html#c-mixed">claims ledger</a>.</p>
+<p class="cap"><b>3.1× on the mixed workload, 3.5× on add + cancel.</b> 1M seeded operations: 55% limit orders near the mid, 40% cancels, 5% market orders. Apple M4, Apple clang 17, <code>-O3</code>, median of 10 interleaved repetitions, on a machine that <a href="#limits">wasn’t idle</a>. For the mixed workload, all three sized for 262,144 orders; add + cancel runs on a warm book of 200 resting orders. v0 and v2 at <a href="https://github.com/aayxshkumar/lob-engine/tree/2265115/bench/results/2026-10-30-m4-b3e2236">2265115</a>; v1, the book from 536cb05, at <a href="https://github.com/aayxshkumar/lob-engine/tree/103a6b0/bench/results/2026-10-29-m4-d512779">103a6b0</a> on branch v1-random. Receipts: <a href="claims.html#c-mixed">claims ledger</a>.</p>
 </div>
 
 <nav class="sections" aria-label="Sections">Sections: <a href="#v0">v0</a>, <a href="#v1">v1</a>, <a href="#v2">v2</a>, <a href="#real-data">real data</a>, <a href="#went-wrong">what went wrong</a>, <a href="#reproduce">reproduce it</a>, <a href="#limits">what I can’t measure yet</a>, <a href="#revisions">revisions</a>.</nav>
 
 <figure class="withcap" id="steps">
 <picture><source media="(max-width: 600px)" srcset="steps-narrow.svg" width="360" height="268"><img src="steps.svg" alt="Bar chart of mixed-workload throughput. v0: 20.9M operations a second with sequential ids, 19.9M with random-looking ids. v1: 35.7M and 31.2M. v2: 65.2M and 56.2M." width="720" height="222"></picture>
-<figcaption><b>v2 is 3.1× v0 with sequential ids, and 2.8× with random-looking ones.</b> Filled bars: ids 1, 2, 3…; outlined: the same ids scrambled. Same runs as the table. Drawn by <code>tools/plot_steps.py</code> in this site’s repo, with figures copied from the raw output at e12cc5d and, for v1, 752c2cf.</figcaption>
+<figcaption><b>v2 is 3.1× v0 with sequential ids, and 2.8× with random-looking ones.</b> Filled bars: ids 1, 2, 3…; outlined: the same ids scrambled. Same runs as the table. Drawn by <code>tools/plot_steps.py</code> in this site’s repo, with figures copied from the raw output at 2265115 and, for v1, 103a6b0.</figcaption>
 </figure>
 
 <h2 id="v0"><a href="#v0">v0: the baseline, and how I know it’s right</a></h2>
@@ -83,10 +83,10 @@
 <tr><th scope="row">1,000-tick gaps</th><td>1.57</td><td><strong>1.20</strong></td><td>0.60</td></tr>
 </tbody>
 </table>
-<p class="cap"><b>With the bitset, v1 clears sparse levels faster than <code>std::map</code> at every gap.</b> <code>BM_SparseSweep</code>: 50 asks, cleared one level at a time by market orders; only the sweep is timed. Apple M4, Apple clang 17, <code>-O3</code>, median of 10 interleaved repetitions. Raw output at <a href="https://github.com/aayxshkumar/lob-engine/tree/e12cc5d/bench/results/2026-10-30-m4-5cbfc0c">e12cc5d</a> (v0, v2) and <a href="https://github.com/aayxshkumar/lob-engine/tree/752c2cf/bench/results/2026-10-29-m4-56199b6">752c2cf</a> (v1).</p>
+<p class="cap"><b>With the bitset, v1 clears sparse levels faster than <code>std::map</code> at every gap.</b> <code>BM_SparseSweep</code>: 50 asks, cleared one level at a time by market orders; only the sweep is timed. Apple M4, Apple clang 17, <code>-O3</code>, median of 10 interleaved repetitions. Raw output at <a href="https://github.com/aayxshkumar/lob-engine/tree/2265115/bench/results/2026-10-30-m4-b3e2236">2265115</a> (v0, v2) and <a href="https://github.com/aayxshkumar/lob-engine/tree/103a6b0/bench/results/2026-10-29-m4-d512779">103a6b0</a> (v1).</p>
 </div>
 
-<p>The first array version was slower than the map. In the earlier harness it took 22.5 µs a sweep with 1-tick gaps, against 2.0 µs for <code>std::map</code>.<span class="note" role="note">That harness also timed a pause and resume of the benchmark timer, about 0.4 µs, and the book’s teardown, and the build with this bug was never committed. The table above times only the sweep (<a href="https://github.com/aayxshkumar/lob-engine/commit/5cbfc0c">5cbfc0c</a>), so the two sets of figures aren’t comparable.</span> That figure didn’t make sense: with 1-tick gaps there’s almost nothing to scan. When the last ask was cleared, the scan walked the whole 65,536-tick band looking for an ask that didn’t exist. The book already counted its levels, so it now checks the count and skips the scan when a side is empty.</p>
+<p>The first array version was slower than the map. In the earlier harness it took 22.5 µs a sweep with 1-tick gaps, against 2.0 µs for <code>std::map</code>.<span class="note" role="note">That harness also timed a pause and resume of the benchmark timer, about 0.4 µs, and the book’s teardown, and the build with this bug was never committed. The table above times only the sweep (<a href="https://github.com/aayxshkumar/lob-engine/commit/b3e2236">b3e2236</a>), so the two sets of figures aren’t comparable.</span> That figure didn’t make sense: with 1-tick gaps there’s almost nothing to scan. When the last ask was cleared, the scan walked the whole 65,536-tick band looking for an ask that didn’t exist. The book already counted its levels, so it now checks the count and skips the scan when a side is empty.</p>
 
 <p>That left real gaps. Walking the array one level at a time still took 3.0 µs a sweep with 100-tick gaps and 14.8 µs with 1,000-tick gaps, in the same harness. The fix is one bit per price level, set while the level has orders. Finding the next non-empty level then checks 64 levels per step with <code>std::countr_zero</code>, which beats following <code>std::map</code> pointers even with 1,000 empty ticks between levels.</p>
 
@@ -96,7 +96,7 @@
 
 <p>Before replacing it I looked at what the benchmark fed it. The generator numbered orders 1, 2, 3 and so on. That’s unusually kind to <code>unordered_map</code>: with libc++, consecutive ids land in consecutive buckets, and nodes allocated one after another tend to sit close together in memory. A real feed rarely gives one book a dense 1, 2, 3 run: on Nasdaq ITCH, for example, order numbers are assigned across every instrument, so a single book sees a sparse, interleaved subset, and scrambled ids are the pessimistic version of that. Scrambling the same ids with a bijective mixer (the splitmix64 finaliser, so they stay unique) cost v1 about an eighth of its throughput, from 35.7M to 31.2M ops/s (the chart above).<span class="note" role="note">The finaliser is a bijection on 64-bit integers, so every id maps to a different id: the scrambled run has the same orders, prices and sizes, and only the id bits change.</span> It turned out not to be special to <code>unordered_map</code>: v2’s table, once built, lost about as much, from 65.2M to 56.2M, so scrambled ids are the fairer test for both.</p>
 
-<p>The replacement, <a href="https://github.com/aayxshkumar/lob-engine/blob/9d18ba6/include/lob/id_table.hpp"><code>IdTable</code></a>, is about 100 lines:</p>
+<p>The replacement, <a href="https://github.com/aayxshkumar/lob-engine/blob/4fde641/include/lob/id_table.hpp"><code>IdTable</code></a>, is about 100 lines:</p>
 
 <ul>
 <li>A flat array of 16-byte entries, each an order id and a pool slot.</li>
@@ -106,7 +106,7 @@
 <li>A fixed capacity, taken from the order pool, so it never rehashes.</li>
 </ul>
 
-<p class="codecap"><code>include/lob/id_table.hpp</code> at <a href="https://github.com/aayxshkumar/lob-engine/blob/9d18ba6/include/lob/id_table.hpp#L62-L83">9d18ba6</a>, lines 62–83</p>
+<p class="codecap"><code>include/lob/id_table.hpp</code> at <a href="https://github.com/aayxshkumar/lob-engine/blob/4fde641/include/lob/id_table.hpp#L62-L83">4fde641</a>, lines 62–83</p>
 <pre class="wide"><code>bool erase(OrderId id) {
     std::size_t i = home(id);
     for (;; i = (i + 1) &amp; mask_) {
@@ -142,14 +142,14 @@
 <tr><th scope="row">262,144 orders</th><td>2<sup>19</sup></td><td>8 MB</td><td class="t">1.83× with sequential ids, 1.80× with random-looking ones</td></tr>
 </tbody>
 </table>
-<p class="cap"><b>The table’s memory follows the configured capacity, not the live orders.</b> Slots are twice the capacity, rounded up to a power of two (<a href="https://github.com/aayxshkumar/lob-engine/blob/9d18ba6/include/lob/id_table.hpp#L34"><code>id_table.hpp</code> line 34</a>). Speeds from the raw output at <a href="https://github.com/aayxshkumar/lob-engine/tree/e12cc5d/bench/results/2026-10-30-m4-5cbfc0c">e12cc5d</a> and, for v1, <a href="https://github.com/aayxshkumar/lob-engine/tree/752c2cf/bench/results/2026-10-29-m4-56199b6">752c2cf</a>.</p>
+<p class="cap"><b>The table’s memory follows the configured capacity, not the live orders.</b> Slots are twice the capacity, rounded up to a power of two (<a href="https://github.com/aayxshkumar/lob-engine/blob/4fde641/include/lob/id_table.hpp#L34"><code>id_table.hpp</code> line 34</a>). Speeds from the raw output at <a href="https://github.com/aayxshkumar/lob-engine/tree/2265115/bench/results/2026-10-30-m4-b3e2236">2265115</a> and, for v1, <a href="https://github.com/aayxshkumar/lob-engine/tree/103a6b0/bench/results/2026-10-29-m4-d512779">103a6b0</a>.</p>
 </div>
 
 <p>Size it for the peak you expect, not the biggest number you can think of.</p>
 
 <h2 id="real-data"><a href="#real-data">On real data</a></h2>
 
-<p>A seeded generator is easy to fool yourself with, as the ids showed. So I recorded 20 minutes of Binance’s public BTCUSDT feed (11,992 depth updates and 71,328 trades) with a <a href="https://github.com/aayxshkumar/lob-engine/blob/9014c87/tools/record_binance.py">small recorder</a> that uses only Python’s standard library. It follows Binance’s procedure for keeping a local book and stops at the first sequence gap.</p>
+<p>A seeded generator is easy to fool yourself with, as the ids showed. So I recorded 20 minutes of Binance’s public BTCUSDT feed (11,992 depth updates and 71,328 trades) with a <a href="https://github.com/aayxshkumar/lob-engine/blob/1ac5c8d/tools/record_binance.py">small recorder</a> that uses only Python’s standard library. It follows Binance’s procedure for keeping a local book and stops at the first sequence gap.</p>
 
 <p>Binance publishes price levels, not individual orders, so the replay has to invent orders that explain each change. A level that grows gets a new order for the difference. A level that shrinks loses size from its newest orders. A trade becomes an incoming order at the trade price, which fills the oldest orders there. After every update, the replay checks the book’s top 10 levels on each side against the exchange’s.<span class="note" role="note">This is level-2 data: one total per price, no orders. Queue positions in the replay are inferred from size changes, so they are a model of the queue, not the exchange’s.</span></p>
 
@@ -162,7 +162,7 @@
 <tr><th scope="row">Throughput, M ops/s</th><td>14.7</td><td><strong>79.4</strong></td></tr>
 </tbody>
 </table>
-<p class="cap"><b>v2 replays the recording 5.4× as fast as v0, on a book small enough to fit in cache.</b> 562,850 order operations, at most 4,203 resting at once; median of 5 runs of <code>lob_replay</code>, Apple M4, Apple clang 17. Recorded 29 October 2026, 02:30–02:50 UTC; the recording isn’t published. Raw output: <a href="https://github.com/aayxshkumar/lob-engine/blob/e12cc5d/bench/results/2026-10-30-m4-5cbfc0c/replay.txt">replay.txt</a> at e12cc5d.</p>
+<p class="cap"><b>v2 replays the recording 5.4× as fast as v0, on a book small enough to fit in cache.</b> 562,850 order operations, at most 4,203 resting at once; median of 5 runs of <code>lob_replay</code>, Apple M4, Apple clang 17. Recorded 29 October 2026, 02:30–02:50 UTC; the recording isn’t published. Raw output: <a href="https://github.com/aayxshkumar/lob-engine/blob/2265115/bench/results/2026-10-30-m4-b3e2236/replay.txt">replay.txt</a> at 2265115.</p>
 </div>
 
 <p>That’s 5.4×, more than on the synthetic workload, though I wouldn’t read much into the difference: at most 4,203 orders were resting at once, so the whole book fits in cache. The mix, 53.5% adds, 40.3% cancels and 6.2% size reductions, was close to what the generator produces. Level updates outside a $79,575–$80,231 price band (44,015 of 544,092) were skipped. v0 and v2 end with the same 63,498 fills and 3,985 resting orders.</p>
@@ -187,7 +187,7 @@
 <p>The four commands from the README. The last two need your own recording, since recordings aren’t committed.</p>
 
 <div class="cmd">
-<p class="codecap"><code>README.md</code> at <a href="https://github.com/aayxshkumar/lob-engine/blob/ef0c364/README.md">ef0c364</a></p>
+<p class="codecap"><code>README.md</code> at <a href="https://github.com/aayxshkumar/lob-engine/blob/1ae04f9/README.md">1ae04f9</a></p>
 <pre><code>cmake -S . -B build -DCMAKE_BUILD_TYPE=Release &amp;&amp; cmake --build build -j
 ./build/lob_tests &amp;&amp; ./build/lob_bench &amp;&amp; ./build/lob_latency
 python3 tools/record_binance.py BTCUSDT 1200 data/btcusdt.lobrec
@@ -204,13 +204,13 @@ python3 tools/record_binance.py BTCUSDT 1200 data/btcusdt.lobrec
 
 <h2 id="limits"><a href="#limits">What I can’t measure yet</a></h2>
 
-<p>Apart from the latency ticks and the earlier-harness sweep figures in the v1 section, every benchmark figure on this page is the median of 10 interleaved repetitions (the replay, the median of 5 runs), and the raw output is committed: <a href="https://github.com/aayxshkumar/lob-engine/tree/e12cc5d/bench/results/2026-10-30-m4-5cbfc0c">e12cc5d</a> for v0 and v2, <a href="https://github.com/aayxshkumar/lob-engine/tree/752c2cf/bench/results/2026-10-29-m4-56199b6">752c2cf</a> on branch v1-random for v1. The machine wasn’t idle: each of the four runs from 29–30 October started with a load average between 2.4 and 3.8, and where other processes were sampled, Spotlight indexing held about one core. The ratios between versions held steady (v0 agreed within 1% across the two branches, and the two runs on main within 2%), but the absolute figures may be a few percent low.</p>
+<p>Apart from the latency ticks and the earlier-harness sweep figures in the v1 section, every benchmark figure on this page is the median of 10 interleaved repetitions (the replay, the median of 5 runs), and the raw output is committed: <a href="https://github.com/aayxshkumar/lob-engine/tree/2265115/bench/results/2026-10-30-m4-b3e2236">2265115</a> for v0 and v2, <a href="https://github.com/aayxshkumar/lob-engine/tree/103a6b0/bench/results/2026-10-29-m4-d512779">103a6b0</a> on branch v1-random for v1. The machine wasn’t idle: each of the four runs from 29–30 October started with a load average between 2.4 and 3.8, and where other processes were sampled, Spotlight indexing held about one core. The ratios between versions held steady (v0 agreed within 1% across the two branches, and the two runs on main within 2%), but the absolute figures may be a few percent low.</p>
 
 <p>These are throughput numbers. Latency percentiles are harder on this machine: on Apple Silicon <code>steady_clock</code> ticks every 41.7 ns, so the fastest operations measure as zero or one tick.<span class="note" role="note"><code>sysctl hw.tbfrequency</code> prints 24000000 on this M4: one tick is 1/24,000,000 of a second. <a href="https://vitaut.net/posts/2023/measuring-clock-precision/">Victor Zverovich</a> measured about 41 ns on an M1.</span> My latency tool measures the clock first and, when it’s this coarse, warns that its nanosecond figures are really tick counts; the charts here convert them to ticks.</p>
 
 <figure class="withcap" id="latency">
 <picture><source media="(max-width: 600px)" srcset="latency-cdf-add_limit-narrow.svg" width="360" height="300"><img src="latency-cdf-add_limit.svg" alt="Step chart of add_limit latency in clock ticks on an Apple M4. v2 reads 0 ticks for 55.5 percent of adds and v0 for 16.4 percent; at 1 tick v0 reaches 91.6 percent and v2 95.9 percent; both pass 99 percent by 2 ticks." width="720" height="360"></picture>
-<figcaption><b>v2’s adds read 0 ticks 55.5% of the time; v0’s, 16.4%.</b> Share of the 550,713 <code>add_limit</code> calls in a 1M-operation run that read at most k ticks; a 0 means no tick fell inside the call. p99 is 2 ticks for both; p99.9 is 14 ticks for v0 and 3 for v2. Data: <a href="https://github.com/aayxshkumar/lob-engine/blob/9d18ba6/docs/m4-quantiles.csv">m4-quantiles.csv</a> at 9d18ba6, binned by <code>round(ns / 41.67)</code> in <code>tools/plot_cdf.py</code>.</figcaption>
+<figcaption><b>v2’s adds read 0 ticks 55.5% of the time; v0’s, 16.4%.</b> Share of the 550,713 <code>add_limit</code> calls in a 1M-operation run that read at most k ticks; a 0 means no tick fell inside the call. p99 is 2 ticks for both; p99.9 is 14 ticks for v0 and 3 for v2. Data: <a href="https://github.com/aayxshkumar/lob-engine/blob/4fde641/docs/m4-quantiles.csv">m4-quantiles.csv</a> at 4fde641, binned by <code>round(ns / 41.67)</code> in <code>tools/plot_cdf.py</code>.</figcaption>
 </figure>
 
 <table id="ticks">
@@ -235,15 +235,15 @@ python3 tools/record_binance.py BTCUSDT 1200 data/btcusdt.lobrec
 <li><time datetime="2026-10-29">2026-10-29</time>. First version.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. The latency chart now bins readings by clock tick. The first plot drew two steps per tick, because <code>m4-quantiles.csv</code> writes one tick as 41 or 42 ns. It now bins by <code>round(ns / 41.67)</code> and labels the axis in ticks.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. Removed a sentence that put v2’s gain with random ids, while the table was oversized, at 40%. No committed run gives that figure; the paragraph now uses the README’s numbers.</li>
-<li><time datetime="2026-10-29">2026-10-29</time>. Corrected the sizing note. v1’s 34.3M was measured at <a href="https://github.com/aayxshkumar/lob-engine/commit/ffe9956">ffe9956</a>, whose benchmark sizes the book for all 1M operations; v0 and v2 are sized for 262,144.</li>
-<li><time datetime="2026-10-29">2026-10-29</time>. The commit message of <a href="https://github.com/aayxshkumar/lob-engine/commit/0a8bdc2">0a8bdc2</a> says 20.1M → 34.0M ops/s. Those were the README’s v0 and v1 medians until <a href="https://github.com/aayxshkumar/lob-engine/commit/9d18ba6">9d18ba6</a>, which gives 21.2M and 34.3M. The numbers here are the later ones.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. Corrected the sizing note. v1’s 34.3M was measured at <a href="https://github.com/aayxshkumar/lob-engine/commit/536cb05">536cb05</a>, whose benchmark sizes the book for all 1M operations; v0 and v2 are sized for 262,144.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. The commit message of <a href="https://github.com/aayxshkumar/lob-engine/commit/504521f">504521f</a> says 20.1M → 34.0M ops/s. Those were the README’s v0 and v1 medians until <a href="https://github.com/aayxshkumar/lob-engine/commit/4fde641">4fde641</a>, which gives 21.2M and 34.3M. The numbers here are the later ones.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. The latency chart’s caption said v2 finishes 55.5% of adds inside one clock tick, and the axis had a 0 ns label. A reading of 0 ticks means no tick fell inside the call, so the caption now says those calls read 0 ticks and the label is gone.</li>
-<li><time datetime="2026-10-29">2026-10-29</time>. The differential test now compares depth at every price after every step, over 10 seeds (<a href="https://github.com/aayxshkumar/lob-engine/commit/41bf158">41bf158</a>). Before that it compared depth once, after 20,000 steps, on one seed.</li>
+<li><time datetime="2026-10-29">2026-10-29</time>. The differential test now compares depth at every price after every step, over 10 seeds (<a href="https://github.com/aayxshkumar/lob-engine/commit/688ad43">688ad43</a>). Before that it compared depth once, after 20,000 steps, on one seed.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. The paragraph on the id table sized for 1M said v1 and v2 tied at 34.4M. That was the first run; the committed rerun gives v2 37.7M. It now names the cache, the 16 MB L2 the performance cores share, and says the misses haven’t been counted.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. Replaced a remark that real venues send ids that look random with how ITCH assigns them: order numbers are shared across all instruments, so one book sees a sparse, interleaved subset.</li>
 <li><time datetime="2026-10-29">2026-10-29</time>. Marked v1’s random-id figure as never committed; another run gave a different result.</li>
 <li><time datetime="2026-10-30">2026-10-30</time>. Reworded the planted-bug sentences so they don’t say who planted each bug; the work is co-authored with Claude Code (<a href="colophon.html#ai">colophon</a>).</li>
-<li><time datetime="2026-10-30">2026-10-30</time>. Every throughput number, and the add + cancel and sparse-sweep figures, now come from committed runs with the raw output in the repo: <a href="https://github.com/aayxshkumar/lob-engine/commit/e12cc5d">e12cc5d</a>, and for v1 <a href="https://github.com/aayxshkumar/lob-engine/commit/752c2cf">752c2cf</a> on branch v1-random. Each benchmark is the median of 10 interleaved repetitions (the replay, the median of 5 runs), with all three versions sized for 262,144 orders. They replace the earlier figures, 21.2M → 34.3M → 67.5M ops/s (median of 3, raw output not kept, v1 sized for 1M), so the title now says 65M instead of 68M. v1’s random-id figure is now measured and committed. The sparse sweep now times only the sweep, so the linear-scan figures are marked as from the earlier harness. The machine wasn’t idle during these runs; see <a href="#limits">What I can’t measure yet</a>.</li>
+<li><time datetime="2026-10-30">2026-10-30</time>. Every throughput number, and the add + cancel and sparse-sweep figures, now come from committed runs with the raw output in the repo: <a href="https://github.com/aayxshkumar/lob-engine/commit/2265115">2265115</a>, and for v1 <a href="https://github.com/aayxshkumar/lob-engine/commit/103a6b0">103a6b0</a> on branch v1-random. Each benchmark is the median of 10 interleaved repetitions (the replay, the median of 5 runs), with all three versions sized for 262,144 orders. They replace the earlier figures, 21.2M → 34.3M → 67.5M ops/s (median of 3, raw output not kept, v1 sized for 1M), so the title now says 65M instead of 68M. v1’s random-id figure is now measured and committed. The sparse sweep now times only the sweep, so the linear-scan figures are marked as from the earlier harness. The machine wasn’t idle during these runs; see <a href="#limits">What I can’t measure yet</a>.</li>
 </ol>
 
 </main>

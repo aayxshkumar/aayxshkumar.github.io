@@ -1,16 +1,16 @@
 {
   "source": {
     "repo": "https://github.com/aayxshkumar/lob-engine",
-    "sha": "e12cc5d"
+    "sha": "2265115"
   },
   "machine": "Apple M4, macOS 26, Apple clang 17, -O3, one thread",
   "statistic": "median of 10 interleaved repetitions (for the replay, of 5 runs)",
   "conditions": "The machine was not idle: each of the four runs from 29–30 October started with a load average of 2.4 to 3.8, and where other processes were sampled, Spotlight indexing held about one core. Ratios between versions are stable (v0 agrees within 1% across branches, and main’s two runs within 2%); absolute figures may be a few percent low.",
   "raw": [
     {
-      "path": "bench/results/2026-10-30-m4-5cbfc0c",
-      "sha": "e12cc5d",
-      "note": "tools/run_bench.sh at 5cbfc0c",
+      "path": "bench/results/2026-10-30-m4-b3e2236",
+      "sha": "2265115",
+      "note": "tools/run_bench.sh at b3e2236",
       "benches": [
         "v0_map/mixed/1000000/262144",
         "v2/mixed/1000000/262144",
@@ -34,9 +34,9 @@
       ]
     },
     {
-      "path": "bench/results/2026-10-29-m4-56199b6",
-      "sha": "752c2cf",
-      "note": "tools/run_bench.sh at 56199b6, branch v1-random",
+      "path": "bench/results/2026-10-29-m4-d512779",
+      "sha": "103a6b0",
+      "note": "tools/run_bench.sh at d512779, branch v1-random",
       "benches": [
         "v1_array/mixed/1000000/262144",
         "v1_array/mixed_random_ids/1000000/262144",
@@ -64,9 +64,9 @@
       "sizing": "book and id table sized for 262,144 orders",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d",
+      "status": "raw output public at 2265115",
       "earlier": "21.2M → 67.5M ops/s (3.2×), median of 3; that raw output wasn’t kept",
       "used": [
         [
@@ -86,12 +86,12 @@
         "v1_array/mixed/1000000/262144"
       ],
       "statistic": "median of 10 interleaved repetitions",
-      "sizing": "book sized for 262,144 orders, like v0 and v2; the v1 book code of ffe9956 with main’s benchmark harness, on branch v1-random",
+      "sizing": "book sized for 262,144 orders, like v0 and v2; the v1 book code of 536cb05 with main’s benchmark harness, on branch v1-random",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at 752c2cf",
+      "status": "raw output public at 103a6b0",
       "earlier": "34.3M ops/s, median of 3, book sized for 1M; that raw output wasn’t kept",
       "used": [
         [
@@ -116,9 +116,9 @@
       "sizing": "ids scrambled with the splitmix64 finaliser; book and id table sized for 262,144 orders",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "status": "raw output public at 2265115 (v0, v2) and 103a6b0 (v1)",
       "earlier": "20.0M / 30.4M / 60.1M ops/s, median of 3; the v1 figure came from a build that was never committed",
       "used": [
         [
@@ -142,9 +142,9 @@
       "sizing": "book and id table sized for all 1M operations (2^21 slots, 32 MB)",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d (v2) and 752c2cf (v1)",
+      "status": "raw output public at 2265115 (v2) and 103a6b0 (v1)",
       "earlier": "34.4M ops/s against 34.4M for v1, median of 3; a rerun gave v2 37.7M",
       "used": [
         [
@@ -168,9 +168,9 @@
       "statistic": "median of 10 interleaved repetitions",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "status": "raw output public at 2265115 (v0, v2) and 103a6b0 (v1)",
       "earlier": "35.6M / 39.5M / 158M ops/s, median of 3",
       "used": [
         [
@@ -191,9 +191,9 @@
       "sizing": "one order beside 200 resting ones",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
+      "status": "raw output public at 2265115 (v0, v2) and 103a6b0 (v1)",
       "earlier": "32.6 / 28.5 / 8.6 ns, median of 3",
       "used": [
         [
@@ -215,13 +215,13 @@
         "v2/sparse_sweep/1000/manual_time"
       ],
       "statistic": "median of 10 interleaved repetitions",
-      "sizing": "since 5cbfc0c the harness times only the sweep, so these can’t be compared with earlier sweep figures",
+      "sizing": "since b3e2236 the harness times only the sweep, so these can’t be compared with earlier sweep figures",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d (v0, v2) and 752c2cf (v1)",
-      "earlier": "timed with the timer’s pause-and-resume overhead and teardown, median of 3: 2.0 µs map; v1 22.5 µs with the linear-scan bug, 1.5–1.85 µs with the bitset; v2 1.28 µs; the linear-scan build was never committed (0a8bdc2 already has the bitset), and its figure is in the README at 0f928f8",
+      "status": "raw output public at 2265115 (v0, v2) and 103a6b0 (v1)",
+      "earlier": "timed with the timer’s pause-and-resume overhead and teardown, median of 3: 2.0 µs map; v1 22.5 µs with the linear-scan bug, 1.5–1.85 µs with the bitset; v2 1.28 µs; the linear-scan build was never committed (504521f already has the bitset), and its figure is in the README at 9fa3f9c",
       "used": [
         [
           "home (the earlier figure)",
@@ -241,11 +241,11 @@
       "sizing": "562,850 order operations from 20 minutes of Binance BTCUSDT, 29 October 2026, 02:30–02:50 UTC; at most 4,203 orders rest at once, so the whole book fits in cache",
       "published": [
         "README.md",
-        "ef0c364"
+        "1ae04f9"
       ],
-      "status": "raw output public at e12cc5d",
+      "status": "raw output public at 2265115",
       "missing": "the recording isn’t published",
-      "earlier": "15.9M → 81.9M ops/s (5.2×), code at 9014c87; that raw output wasn’t kept",
+      "earlier": "15.9M → 81.9M ops/s (5.2×), code at 1ac5c8d; that raw output wasn’t kept",
       "used": [
         [
           "home",
@@ -264,9 +264,9 @@
       "command": "./build/lob_replay data/btcusdt.lobrec",
       "published": [
         "README.md",
-        "2178cef"
+        "33bf6a5"
       ],
-      "status": "raw output public at e12cc5d",
+      "status": "raw output public at 2265115",
       "missing": "the recording isn’t published; CI runs the same check, strict, on a synthetic file",
       "used": [
         [
@@ -286,9 +286,9 @@
       "command": "./build/lob_latency 1000000 --csv docs/m4-quantiles.csv",
       "data": [
         "docs/m4-quantiles.csv",
-        "9d18ba6"
+        "4fde641"
       ],
-      "status": "public at 9d18ba6",
+      "status": "public at 4fde641",
       "used": [
         [
           "home",
@@ -306,9 +306,9 @@
       "value": "p99 2 ticks for both; p99.9 14 ticks v0, 3 ticks v2",
       "data": [
         "docs/m4-quantiles.csv",
-        "9d18ba6"
+        "4fde641"
       ],
-      "status": "public at 9d18ba6",
+      "status": "public at 4fde641",
       "used": [
         [
           "home",
@@ -342,7 +342,7 @@
       "command": "./build/lob_tests",
       "published": [
         "README.md",
-        "2178cef"
+        "33bf6a5"
       ],
       "status": "README only",
       "missing": "the mutant patches aren’t committed yet",
@@ -363,9 +363,9 @@
       "command": "./build/lob_tests",
       "data": [
         "tests/",
-        "41bf158"
+        "688ad43"
       ],
-      "status": "public at 41bf158",
+      "status": "public at 688ad43",
       "used": [
         [
           "home",

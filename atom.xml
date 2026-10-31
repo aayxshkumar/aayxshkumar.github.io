@@ -20,7 +20,7 @@
     <link href="https://aayxshkumar.github.io/#real-data"/>
     <published>2026-10-29T00:00:00+05:30</published>
     <updated>2026-10-30T00:00:00+05:30</updated>
-    <summary>562,850 order operations: v2 at 79.4M ops/s against 14.7M for std::map, on a book of at most 4,203 orders, small enough to fit in cache. Speeds from the 30 October rerun at e12cc5d.</summary>
+    <summary>562,850 order operations: v2 at 79.4M ops/s against 14.7M for std::map, on a book of at most 4,203 orders, small enough to fit in cache. Speeds from the 30 October rerun at 2265115.</summary>
   </entry>
   <entry>
     <title>v2: an open-addressing id table, and the 32 MB table that hid its gain</title>
@@ -28,7 +28,7 @@
     <link href="https://aayxshkumar.github.io/#id-table"/>
     <published>2026-10-29T00:00:00+05:30</published>
     <updated>2026-10-30T00:00:00+05:30</updated>
-    <summary>Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is 1.8× as fast as v1. Speeds from the 30 October reruns at e12cc5d and, for v1, 752c2cf.</summary>
+    <summary>Sized for 1M orders the table didn't fit in cache; sized for the workload, v2 is 1.8× as fast as v1. Speeds from the 30 October reruns at 2265115 and, for v1, 103a6b0.</summary>
   </entry>
   <entry>
     <title>A benchmark found a full-band scan in my “faster” version</title>
